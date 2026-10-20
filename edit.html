@@ -9,18 +9,15 @@
 </head>
 <body>
 
-    <!-- ================= TOP HEADER ================= -->
     <header class="admin-header">
         <div class="logo">ADMIN PANEL</div>
         <button id="logoutBtn" class="btn-logout-top">Logout</button>
     </header>
 
-    <!-- ================= MAIN CONTENT ================= -->
     <main class="main-content">
         
         <h2 class="page-title">Edit Episode / Video</h2>
         
-        <!-- Selector Box (Anime & Episode Dropdowns) -->
         <div class="dynamic-section selector-box">
             <div class="row-inputs">
                 <div class="input-group">
@@ -38,7 +35,6 @@
             </div>
         </div>
 
-        <!-- Edit Form (Hidden by default until episode is selected) -->
         <form id="editEpisodeForm" style="display: none;">
             <input type="hidden" id="editEpId">
             
@@ -53,70 +49,57 @@
                 </div>
             </div>
 
-            <!-- MULTIPLE QUALITIES & AUDIO -->
+            <!-- 1. VIDEO QUALITIES -->
             <div class="dynamic-section">
                 <div class="dynamic-header">
-                    <h3>Video Sources (Quality & Audio)</h3>
+                    <h3>Video Qualities</h3>
                     <button type="button" class="btn-add-row" onclick="addQualityRow()">+ Add Quality</button>
                 </div>
-                <div id="qualityContainer">
-                    <!-- Rows injected via JS -->
-                </div>
+                <div id="qualityContainer"></div>
             </div>
 
-            <!-- MULTIPLE SUBTITLES -->
+            <!-- 2. AUDIO TRACKS -->
+            <div class="dynamic-section">
+                <div class="dynamic-header">
+                    <h3>Audio Tracks (Dubs)</h3>
+                    <button type="button" class="btn-add-row" onclick="addAudioRow()">+ Add Audio</button>
+                </div>
+                <div id="audioContainer"></div>
+            </div>
+
+            <!-- 3. SUBTITLES -->
             <div class="dynamic-section">
                 <div class="dynamic-header">
                     <h3>Subtitles (Captions)</h3>
                     <button type="button" class="btn-add-row" onclick="addSubtitleRow()">+ Add Subtitle</button>
                 </div>
-                <div id="subtitleContainer">
-                    <!-- Rows injected via JS -->
-                </div>
+                <div id="subtitleContainer"></div>
             </div>
 
             <button type="submit" class="btn-primary">Update Episode</button>
             <p id="editEpMsg" class="success-msg"></p>
         </form>
-        
     </main>
 
-    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
     <nav class="admin-bottom-nav">
-        <!-- Anime List -->
         <a href="anime-list.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
             <span>List</span>
         </a>
-        
-        <!-- Add Anime -->
         <a href="anime.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
             <span>Add Anime</span>
         </a>
-
-        <!-- Upload Episode -->
         <a href="upload.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
             <span>Upload</span>
         </a>
-
-        <!-- Edit Episode (Active) -->
         <a href="edit.html" class="nav-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
             <span>Edit</span>
         </a>
     </nav>
 
-    <!-- Admin Script -->
     <script type="module" src="admin.js"></script>
 </body>
 </html>
