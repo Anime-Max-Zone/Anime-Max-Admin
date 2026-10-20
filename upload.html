@@ -41,12 +41,12 @@
             <!-- 1. VIDEO QUALITIES -->
             <div class="dynamic-section">
                 <div class="dynamic-header">
-                    <h3>Video Qualities</h3>
+                    <h3>Video Qualities (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addQualityRow()">+ Add Quality</button>
                 </div>
                 <div id="qualityContainer">
                     <div class="dynamic-row">
-                        <input type="url" placeholder="Video URL (MP4 or GDrive)" class="v-url" required>
+                        <input type="url" placeholder="Video URL (MP4 or GDrive)" class="v-url">
                         <select class="v-quality">
                             <option value="1080">1080p HD</option>
                             <option value="720">720p</option>
@@ -60,7 +60,7 @@
             <!-- 2. AUDIO TRACKS -->
             <div class="dynamic-section">
                 <div class="dynamic-header">
-                    <h3>Audio Tracks (Dubs)</h3>
+                    <h3>Audio Tracks (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addAudioRow()">+ Add Audio</button>
                 </div>
                 <div id="audioContainer">
@@ -79,12 +79,12 @@
             <!-- 3. SUBTITLES -->
             <div class="dynamic-section">
                 <div class="dynamic-header">
-                    <h3>Subtitles (Captions)</h3>
+                    <h3>Subtitles (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addSubtitleRow()">+ Add Subtitle</button>
                 </div>
                 <div id="subtitleContainer">
                     <div class="dynamic-row">
-                        <input type="url" placeholder="Subtitle URL (.vtt) - Optional" class="s-url">
+                        <input type="url" placeholder="Subtitle URL (.vtt)" class="s-url">
                         <select class="s-lang">
                             <option value="en">English</option>
                             <option value="hi">Hindi</option>
