@@ -1,5 +1,5 @@
 /* ============================================================
-   ANIME MAX ZONE — Admin Panel Styles
+   ANIME MAX ZONE — Admin Panel Styles (Header + Bottom Nav)
    ============================================================ */
 
 /* ---------- RESET & VARIABLES ---------- */
@@ -28,6 +28,8 @@ body {
     color: var(--text); 
     min-height: 100vh; 
     overflow-x: hidden;
+    /* Bottom Nav ke liye jagah */
+    padding-bottom: 75px; 
 }
 
 a { color: inherit; text-decoration: none; }
@@ -56,33 +58,8 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
-.login-box h2 { 
-    margin-bottom: 0.5rem; 
-    font-size: 1.8rem; 
-    color: var(--text); 
-}
-
-.login-box p { 
-    color: var(--text-muted); 
-    margin-bottom: 2rem; 
-    font-size: 0.95rem; 
-}
-
-/* Inputs */
-.login-box input, 
-.input-group input, 
-.input-group select, 
-.input-group textarea {
-    width: 100%; 
-    padding: 1rem; 
-    background: var(--bg-2);
-    border: 1px solid var(--border); 
-    border-radius: 10px; 
-    color: white; 
-    outline: none;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
+.login-box h2 { margin-bottom: 0.5rem; font-size: 1.8rem; }
+.login-box p { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.95rem; }
 
 .login-box input { margin-bottom: 1.2rem; }
 
@@ -94,120 +71,89 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     box-shadow: 0 0 10px rgba(157, 78, 221, 0.2);
 }
 
-/* ============================================================
-   2. DASHBOARD LAYOUT (anime-list, anime, upload, edit)
-   ============================================================ */
-.dashboard-container { 
-    display: flex; 
-    min-height: 100vh; 
+.back-link {
+    display: block;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    transition: color 0.2s;
 }
+.back-link:hover { color: var(--primary); }
 
-/* Sidebar */
-.sidebar {
-    width: 280px; 
-    background: var(--bg-2); 
-    border-right: 1px solid var(--border);
-    padding: 2rem 1.5rem; 
-    display: flex; 
-    flex-direction: column;
+/* ============================================================
+   2. TOP HEADER
+   ============================================================ */
+.admin-header {
     position: sticky;
     top: 0;
-    height: 100vh;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: rgba(10, 10, 15, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
 }
 
-.sidebar .logo { 
-    font-size: 1.5rem; 
-    font-weight: 900; 
-    color: var(--primary); 
-    margin-bottom: 2.5rem; 
-    text-align: center; 
+.admin-header .logo {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--primary);
     letter-spacing: 1px;
 }
 
-.nav-btn {
-    width: 100%; 
-    padding: 1rem 1.2rem; 
-    margin-bottom: 0.8rem; 
-    background: transparent;
-    border: none; 
-    color: var(--text-muted); 
-    text-align: left; 
-    border-radius: 10px; 
-    font-size: 1rem; 
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: block;
-}
-
-.nav-btn:hover { 
-    background: rgba(157, 78, 221, 0.1); 
-    color: var(--primary); 
-}
-
-.nav-btn.active { 
-    background: var(--primary); 
-    color: white; 
-    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
-}
-
-.logout-btn {
-    margin-top: auto; 
-    padding: 1rem; 
-    background: rgba(255, 107, 107, 0.1); 
+.btn-logout-top {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 107, 107, 0.1);
     border: 1px solid var(--danger);
-    border-radius: 10px; 
-    color: var(--danger); 
-    font-weight: bold;
-    transition: all 0.3s;
+    border-radius: 8px;
+    color: var(--danger);
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: 0.2s;
 }
 
-.logout-btn:hover {
+.btn-logout-top:hover {
     background: var(--danger);
     color: white;
 }
 
-/* Main Content Area */
+/* ============================================================
+   3. MAIN CONTENT
+   ============================================================ */
 .main-content { 
-    flex: 1; 
-    padding: 3rem; 
-    overflow-y: auto; 
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem; 
 }
 
-.tab-content h2 { 
-    margin-bottom: 2rem; 
-    border-bottom: 1px solid var(--border); 
-    padding-bottom: 1rem; 
-    font-size: 1.8rem;
+.main-content h2 { 
+    margin-bottom: 1.5rem; 
+    font-size: 1.5rem;
     color: var(--text);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 /* ============================================================
-   3. FORMS & INPUT GROUPS
+   4. FORMS & INPUT GROUPS
    ============================================================ */
 form { 
     background: var(--card); 
-    padding: 2.5rem; 
+    padding: 2rem; 
     border-radius: 16px; 
     border: 1px solid var(--border); 
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    max-width: 800px;
 }
 
-.input-group { 
-    margin-bottom: 1.5rem; 
-}
+.input-group { margin-bottom: 1.5rem; }
 
 .row-inputs { 
     display: flex; 
     gap: 1.5rem; 
 }
 
-.row-inputs .input-group { 
-    flex: 1; 
-}
+.row-inputs .input-group { flex: 1; }
 
 .input-group label { 
     display: block; 
@@ -217,13 +163,28 @@ form {
     font-weight: 600;
 }
 
+.login-box input, 
+.input-group input, 
+.input-group select, 
+.input-group textarea {
+    width: 100%; 
+    padding: 0.9rem; 
+    background: var(--bg-2);
+    border: 1px solid var(--border); 
+    border-radius: 10px; 
+    color: white; 
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
 .input-group textarea {
     resize: vertical;
-    min-height: 120px;
+    min-height: 100px;
 }
 
 /* ============================================================
-   4. BUTTONS & MESSAGES
+   5. BUTTONS & MESSAGES
    ============================================================ */
 .btn-primary {
     width: 100%; 
@@ -248,20 +209,143 @@ form {
 .error-msg { 
     color: var(--danger); 
     margin-top: 1rem; 
-    font-size: 0.9rem; 
     text-align: center;
+    font-size: 0.9rem;
 }
 
 .success-msg { 
     color: var(--success); 
     margin-top: 1rem; 
-    font-size: 0.9rem; 
     text-align: center;
     font-weight: 600;
+    font-size: 0.9rem;
 }
 
 /* ============================================================
-   5. ADMIN LIST CARDS (anime-list.html)
+   6. BOTTOM NAVIGATION BAR
+   ============================================================ */
+.admin-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(18, 18, 26, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 900;
+}
+
+.admin-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 600;
+    gap: 4px;
+    width: 25%;
+    padding: 5px 0;
+    transition: color 0.2s;
+}
+
+.admin-bottom-nav .nav-item svg {
+    width: 22px;
+    height: 22px;
+}
+
+.admin-bottom-nav .nav-item:hover,
+.admin-bottom-nav .nav-item.active {
+    color: var(--primary);
+}
+
+.admin-bottom-nav .nav-item.active svg {
+    filter: drop-shadow(0 0 5px rgba(157, 78, 221, 0.5));
+}
+
+/* ============================================================
+   7. DYNAMIC ROWS (Upload & Edit Page)
+   ============================================================ */
+.dynamic-section {
+    background: var(--bg-2);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.dynamic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+.dynamic-header h3 { font-size: 1.1rem; color: var(--primary); }
+
+.btn-add-row {
+    background: rgba(157, 78, 221, 0.15);
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.btn-add-row:hover { background: var(--primary); color: white; }
+
+.dynamic-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+    background: var(--card);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.dynamic-row input, .dynamic-row select {
+    flex: 1;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: white;
+    outline: none;
+}
+
+.btn-remove-row {
+    background: rgba(255, 107, 107, 0.1);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    width: 35px;
+    height: 35px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-remove-row:hover { background: var(--danger); color: white; }
+
+/* ============================================================
+   8. ADMIN LIST CARDS (anime-list.html)
    ============================================================ */
 .admin-list { 
     display: grid; 
@@ -293,21 +377,9 @@ form {
     box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-.admin-info { 
-    flex: 1; 
-}
-
-.admin-info h3 { 
-    font-size: 1.2rem; 
-    margin-bottom: 0.4rem; 
-    color: var(--text);
-}
-
-.admin-info p { 
-    font-size: 0.85rem; 
-    color: var(--text-muted); 
-    line-height: 1.4;
-}
+.admin-info { flex: 1; }
+.admin-info h3 { font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text); }
+.admin-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
 
 .btn-delete {
     background: rgba(255, 107, 107, 0.1); 
@@ -317,52 +389,17 @@ form {
     border-radius: 8px; 
     font-weight: 600;
     transition: all 0.2s;
+    text-align: center;
 }
 
-.btn-delete:hover { 
-    background: var(--danger); 
-    color: white; 
-}
+.btn-delete:hover { background: var(--danger); color: white; }
 
 /* ============================================================
-   6. RESPONSIVE (Mobile & Tablets)
+   9. RESPONSIVE (Mobile)
    ============================================================ */
-@media (max-width: 900px) {
-    .dashboard-container {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 1rem;
-        flex-direction: row;
-        overflow-x: auto;
-        align-items: center;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
-        gap: 10px;
-    }
-    
-    .sidebar .logo { display: none; }
-    
-    .nav-btn {
-        width: auto;
-        white-space: nowrap;
-        margin-bottom: 0;
-        padding: 0.6rem 1rem;
-    }
-    
-    .logout-btn {
-        margin-top: 0;
-        margin-left: auto;
-        padding: 0.6rem 1rem;
-        white-space: nowrap;
-    }
-
+@media (max-width: 768px) {
     .main-content {
-        padding: 1.5rem;
+        padding: 1.5rem 1rem;
     }
 
     form {
@@ -384,8 +421,24 @@ form {
         height: 140px;
     }
 
+    .admin-card > div {
+        flex-direction: column;
+        width: 100%;
+    }
+
     .btn-delete, .admin-card .btn-primary {
         width: 100%;
         margin-top: 0.5rem;
+    }
+
+    .dynamic-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-remove-row {
+        width: 100%;
+        height: 40px;
+        margin-top: 5px;
     }
 }
