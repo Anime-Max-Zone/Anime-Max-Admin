@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Anime — Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">ADMIN PANEL</div>
+            <nav>
+                <a href="anime-list.html" class="nav-btn">Anime List</a>
+                <a href="anime.html" class="nav-btn">Add Anime</a>
+                <a href="upload.html" class="nav-btn">Upload Episode</a>
+            </nav>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </aside>
+
+        <main class="main-content">
+            <h2>Edit Anime / Movie</h2>
+            <form id="editAnimeForm">
+                <input type="hidden" id="editAnimeId">
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" id="editTitle" required>
+                </div>
+                <div class="input-group">
+                    <label>Type</label>
+                    <select id="editType">
+                        <option value="series">Series</option>
+                        <option value="movie">Movie</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Poster Image URL</label>
+                    <input type="url" id="editPoster" required>
+                </div>
+                <div class="input-group">
+                    <label>Genres (Comma separated)</label>
+                    <input type="text" id="editGenres" required>
+                </div>
+                <div class="input-group">
+                    <label>Total Seasons</label>
+                    <input type="number" id="editSeasons" min="1">
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea id="editDesc" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Update Anime</button>
+                <p id="editMsg" class="success-msg"></p>
+            </form>
+        </main>
+    </div>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
