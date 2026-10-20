@@ -3,58 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Anime — Admin</title>
+    <title>Edit Episode — Admin</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo">ADMIN PANEL</div>
-            <nav>
-                <a href="anime-list.html" class="nav-btn">Anime List</a>
-                <a href="anime.html" class="nav-btn">Add Anime</a>
-                <a href="upload.html" class="nav-btn">Upload Episode</a>
-            </nav>
-            <button id="logoutBtn" class="logout-btn">Logout</button>
-        </aside>
 
-        <main class="main-content">
-            <h2>Edit Anime / Movie</h2>
-            <form id="editAnimeForm">
-                <input type="hidden" id="editAnimeId">
+    <!-- ================= TOP HEADER ================= -->
+    <header class="admin-header">
+        <div class="logo">ADMIN PANEL</div>
+        <button id="logoutBtn" class="btn-logout-top">Logout</button>
+    </header>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+        
+        <h2 style="border: none; margin-bottom: 1.5rem; padding: 0;">Edit Episode / Video</h2>
+        
+        <!-- Selector Box -->
+        <div class="dynamic-section" style="margin-bottom: 2rem; background: var(--card);">
+            <div class="row-inputs">
                 <div class="input-group">
-                    <label>Title</label>
-                    <input type="text" id="editTitle" required>
-                </div>
-                <div class="input-group">
-                    <label>Type</label>
-                    <select id="editType">
-                        <option value="series">Series</option>
-                        <option value="movie">Movie</option>
+                    <label>Select Anime</label>
+                    <select id="editSelectAnime">
+                        <option value="">Loading anime...</option>
                     </select>
                 </div>
                 <div class="input-group">
-                    <label>Poster Image URL</label>
-                    <input type="url" id="editPoster" required>
+                    <label>Select Episode</label>
+                    <select id="editSelectEpisode" disabled>
+                        <option value="">Choose Anime First</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Form (Hidden by default until episode is selected) -->
+        <form id="editEpisodeForm" style="display: none;">
+            <input type="hidden" id="editEpId">
+            
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label>Season Number</label>
+                    <input type="number" id="editEpSeason" min="1" required>
                 </div>
                 <div class="input-group">
-                    <label>Genres (Comma separated)</label>
-                    <input type="text" id="editGenres" required>
+                    <label>Episode Number</label>
+                    <input type="number" id="editEpNumber" min="1" required>
                 </div>
-                <div class="input-group">
-                    <label>Total Seasons</label>
-                    <input type="number" id="editSeasons" min="1">
+            </div>
+
+            <!-- MULTIPLE QUALITIES & AUDIO -->
+            <div class="dynamic-section">
+                <div class="dynamic-header">
+                    <h3>Video Sources (Quality & Audio)</h3>
+                    <button type="button" class="btn-add-row" onclick="addQualityRow()">+ Add Quality</button>
                 </div>
-                <div class="input-group">
-                    <label>Description</label>
-                    <textarea id="editDesc" rows="4" required></textarea>
+                <div id="qualityContainer">
+                    <!-- Rows injected via JS -->
                 </div>
-                <button type="submit" class="btn-primary">Update Anime</button>
-                <p id="editMsg" class="success-msg"></p>
-            </form>
-        </main>
-    </div>
+            </div>
+
+            <!-- MULTIPLE SUBTITLES -->
+            <div class="dynamic-section">
+                <div class="dynamic-header">
+                    <h3>Subtitles (Captions)</h3>
+                    <button type="button" class="btn-add-row" onclick="addSubtitleRow()">+ Add Subtitle</button>
+                </div>
+                <div id="subtitleContainer">
+                    <!-- Rows injected via JS -->
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">Update Episode</button>
+            <p id="editEpMsg" class="success-msg"></p>
+        </form>
+        
+    </main>
+
+    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+    <nav class="admin-bottom-nav">
+        <!-- Anime List -->
+        <a href="anime-list.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            <span>List</span>
+        </a>
+        
+        <!-- Add Anime -->
+        <a href="anime.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add Anime</span>
+        </a>
+
+        <!-- Upload Episode -->
+        <a href="upload.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Upload</span>
+        </a>
+
+        <!-- Edit Episode (Active) -->
+        <a href="edit.html" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+        </a>
+    </nav>
+
+    <!-- Admin Script -->
     <script type="module" src="admin.js"></script>
 </body>
 </html>
