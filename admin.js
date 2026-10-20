@@ -1,17 +1,11 @@
-/* ============================================================
-   ANIME MAX ZONE — Admin Panel Logic
-   ============================================================ */
-
-// ---------- 1. Firebase Imports ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { 
-    getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc 
+    getFirestore, collection, addDoc, getDocs, query, orderBy, deleteDoc, doc, getDoc, updateDoc 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { 
     getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ---------- 2. Firebase Config ----------
 const firebaseConfig = {
     apiKey: "AIzaSyCpfrluxsBhnz48ve9RykIy1IxzbBfk7dA",
     authDomain: "sm-studio-7.firebaseapp.com",
@@ -25,213 +19,197 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// ---------- 3. DOM Elements ----------
-const loginScreen = document.getElementById("loginScreen");
-const dashboard = document.getElementById("dashboard");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const loginError = document.getElementById("loginError");
+// --- 1. AUTH CHECK (Redirect Logic) ---
+const isLoginPage = window.location.pathname.includes("index.html") || window.location.pathname.endsWith("/");
 
-// ---------- 4. Authentication Logic ----------
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        // User is logged in
-        loginScreen.style.display = "none";
-        dashboard.style.display = "flex";
-        loadAnimeList(); // Load data for dropdown and manage tab
+        // Logged In
+        if (isLoginPage) window.location.href = "anime-list.html";
+        
+        // If on list page, load data
+        if (document.getElementById("adminAnimeList")) loadAnimeList();
+        
+        // If on upload page, load dropdown
+        if (document.getElementById("selectAnimeForEp")) loadAnimeForDropdown();
+        
+        // If on edit page, load existing data
+        if (document.getElementById("editAnimeForm")) loadEditData();
+
     } else {
-        // User is logged out
-        loginScreen.style.display = "flex";
-        dashboard.style.display = "none";
+        // Logged Out
+        if (!isLoginPage) window.location.href = "index.html";
     }
 });
 
-// Login Button
-loginBtn.addEventListener("click", async () => {
-    const email = document.getElementById("adminEmail").value;
-    const password = document.getElementById("adminPassword").value;
-    
-    if(!email || !password) {
-        loginError.textContent = "Please enter both email and password.";
-        return;
-    }
+// --- 2. LOGIN / LOGOUT ---
+const loginBtn = document.getElementById("loginBtn");
+if (loginBtn) {
+    loginBtn.addEventListener("click", async () => {
+        const email = document.getElementById("adminEmail").value;
+        const pass = document.getElementById("adminPassword").value;
+        try {
+            await signInWithEmailAndPassword(auth, email, pass);
+        } catch (e) {
+            document.getElementById("loginError").textContent = "Invalid credentials!";
+        }
+    });
+}
 
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => signOut(auth));
+}
+
+// --- 3. ADD ANIME (anime.html) ---
+const animeForm = document.getElementById("animeForm");
+if (animeForm) {
+    animeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("animeMsg");
+        msg.textContent = "Saving...";
+        
+        const newAnime = {
+            title: document.getElementById("animeTitle").value,
+            type: document.getElementById("animeType").value,
+            coverImageUrl: document.getElementById("animePoster").value,
+            genres: document.getElementById("animeGenres").value.split(",").map(g => g.trim()),
+            totalSeasons: parseInt(document.getElementById("animeSeasons").value) || 1,
+            description: document.getElementById("animeDesc").value,
+            createdAt: new Date().toISOString()
+        };
+
+        try {
+            await addDoc(collection(db, "anime"), newAnime);
+            msg.textContent = "Anime saved successfully!";
+            setTimeout(() => window.location.href = "anime-list.html", 1000);
+        } catch (err) {
+            msg.textContent = "Error: " + err.message;
+            msg.style.color = "red";
+        }
+    });
+}
+
+// --- 4. MANAGE LIST (anime-list.html) ---
+async function loadAnimeList() {
+    const container = document.getElementById("adminAnimeList");
     try {
-        loginBtn.textContent = "Logging in...";
-        loginBtn.disabled = true;
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        loginError.textContent = "Invalid email or password!";
-        loginBtn.textContent = "Login";
-        loginBtn.disabled = false;
-    }
-});
+        const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
+        container.innerHTML = "";
+        snap.forEach(d => {
+            const a = d.data();
+            container.innerHTML += `
+                <div class="admin-card">
+                    <img src="${a.coverImageUrl}" alt="${a.title}">
+                    <div class="admin-info">
+                        <h3>${a.title}</h3>
+                        <p>${a.type} • ${a.totalSeasons} Seasons</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <a href="edit.html?id=${d.id}" class="btn-primary" style="padding: 0.5rem 1rem; width:auto; text-decoration:none;">Edit</a>
+                        <button class="btn-delete" onclick="deleteAnime('${d.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (e) { console.error(e); }
+}
 
-// Logout Button
-logoutBtn.addEventListener("click", () => {
-    signOut(auth);
-});
-
-// ---------- 5. Tab Switching Logic ----------
-window.showTab = (tabId) => {
-    // Hide all tabs
-    document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
-    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
-    
-    // Show selected tab
-    document.getElementById(tabId).classList.add("active");
-    event.target.classList.add("active");
-    
-    // If manage tab is opened, refresh list
-    if (tabId === 'manageAnimeTab') {
+window.deleteAnime = async (id) => {
+    if(confirm("Are you sure?")) {
+        await deleteDoc(doc(db, "anime", id));
         loadAnimeList();
     }
 };
 
-// ---------- 6. Add Anime Logic ----------
-document.getElementById("animeForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById("animeMsg");
-    msg.textContent = "Saving...";
-    msg.style.color = "var(--text-muted)";
-
-    // Genres ko array me convert karein
-    const genresInput = document.getElementById("animeGenres").value;
-    const genresArray = genresInput.split(",").map(g => g.trim()).filter(g => g !== "");
-
-    const newAnime = {
-        title: document.getElementById("animeTitle").value.trim(),
-        description: document.getElementById("animeDesc").value.trim(),
-        coverImageUrl: document.getElementById("animePoster").value.trim(),
-        genres: genresArray,
-        type: document.getElementById("animeType").value,
-        totalSeasons: parseInt(document.getElementById("animeSeasons").value) || 1,
-        createdAt: new Date().toISOString()
-    };
-
-    try {
-        await addDoc(collection(db, "anime"), newAnime);
-        msg.textContent = "Anime added successfully!";
-        msg.style.color = "var(--success)";
-        document.getElementById("animeForm").reset();
-        loadAnimeList(); // Refresh list
-    } catch (error) {
-        msg.textContent = "Error: " + error.message;
-        msg.style.color = "var(--danger)";
-    }
-});
-
-// ---------- 7. Add Episode Logic ----------
-const selectAnimeForEp = document.getElementById("selectAnimeForEp");
-let loadedAnime = []; // Store anime for dropdown
-
+// --- 5. UPLOAD EPISODE (upload.html) ---
 async function loadAnimeForDropdown() {
+    const select = document.getElementById("selectAnimeForEp");
     try {
         const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
-        selectAnimeForEp.innerHTML = `<option value="">Select an Anime</option>`;
-        
-        loadedAnime = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        loadedAnime.forEach(anime => {
-            selectAnimeForEp.innerHTML += `<option value="${anime.id}">${anime.title}</option>`;
+        select.innerHTML = `<option value="">Select an Anime</option>`;
+        snap.forEach(d => {
+            select.innerHTML += `<option value="${d.id}" data-title="${d.data().title}">${d.data().title}</option>`;
         });
-    } catch (err) {
-        console.error("Error loading dropdown:", err);
-    }
+    } catch (e) { console.error(e); }
 }
 
-document.getElementById("episodeForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const msg = document.getElementById("episodeMsg");
-    msg.textContent = "Saving...";
-    msg.style.color = "var(--text-muted)";
-
-    const animeId = selectAnimeForEp.value;
-    const selectedAnime = loadedAnime.find(a => a.id === animeId);
-
-    if (!selectedAnime) {
-        msg.textContent = "Please select an anime!";
-        msg.style.color = "var(--danger)";
-        return;
-    }
-
-    const newEpisode = {
-        animeId: animeId,
-        animeTitle: selectedAnime.title,
-        season: parseInt(document.getElementById("epSeason").value) || 1,
-        episode: parseInt(document.getElementById("epNumber").value) || 1,
-        videoUrl: document.getElementById("epVideoUrl").value.trim(),
-        subtitleUrl: document.getElementById("epSubUrl").value.trim(),
-        createdAt: new Date().toISOString()
-    };
-
-    try {
-        await addDoc(collection(db, "episodes"), newEpisode);
-        msg.textContent = "Episode added successfully!";
-        msg.style.color = "var(--success)";
-        document.getElementById("episodeForm").reset();
-    } catch (error) {
-        msg.textContent = "Error: " + error.message;
-        msg.style.color = "var(--danger)";
-    }
-});
-
-// ---------- 8. Manage Anime (List & Delete) ----------
-async function loadAnimeList() {
-    const listContainer = document.getElementById("adminAnimeList");
-    
-    // Dono jagah load karein (Manage tab aur Add Episode dropdown)
-    loadAnimeForDropdown(); 
-    
-    // Agar Manage tab active nahi hai toh list render mat karo (optional optimization)
-    if (!listContainer) return;
-    
-    listContainer.innerHTML = "<p>Loading anime list...</p>";
-    
-    try {
-        const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
-        listContainer.innerHTML = "";
+const episodeForm = document.getElementById("episodeForm");
+if(episodeForm) {
+    episodeForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const msg = document.getElementById("episodeMsg");
+        const select = document.getElementById("selectAnimeForEp");
+        const selectedTitle = select.options[select.selectedIndex].getAttribute("data-title");
         
-        if(snap.empty) {
-            listContainer.innerHTML = "<p>No anime found in database.</p>";
-            return;
-        }
+        msg.textContent = "Uploading...";
 
-        snap.docs.forEach(docSnap => {
-            const anime = docSnap.data();
-            const id = docSnap.id;
+        const newEp = {
+            animeId: select.value,
+            animeTitle: selectedTitle,
+            season: parseInt(document.getElementById("epSeason").value),
+            episode: parseInt(document.getElementById("epNumber").value),
+            videoUrl: document.getElementById("epVideoUrl").value,
+            subtitleUrl: document.getElementById("epSubUrl").value,
+            createdAt: new Date().toISOString()
+        };
 
-            // HTML escaping for safety (optional for admin, but good practice)
-            const safeTitle = anime.title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            
-            const card = document.createElement("div");
-            card.className = "admin-card";
-            card.innerHTML = `
-                <img src="${anime.coverImageUrl || 'https://via.placeholder.com/70x100'}" alt="${safeTitle}">
-                <div class="admin-info">
-                    <h3>${safeTitle}</h3>
-                    <p>${anime.type || 'series'} • ${anime.totalSeasons || 1} Seasons • ${Array.isArray(anime.genres) ? anime.genres.join(", ") : ''}</p>
-                </div>
-                <button class="btn-delete" onclick="window.deleteAnime('${id}')">Delete</button>
-            `;
-            listContainer.appendChild(card);
-        });
-
-    } catch (error) {
-        console.error(error);
-        listContainer.innerHTML = "<p style='color:red;'>Error loading anime data.</p>";
-    }
-}
-
-// Delete Function (Global scope me rakha hai taaki onclick kaam kare)
-window.deleteAnime = async (id) => {
-    if (confirm("Are you sure you want to delete this anime? This action cannot be undone.")) {
         try {
-            await deleteDoc(doc(db, "anime", id));
-            alert("Anime deleted successfully!");
-            loadAnimeList(); // Refresh list
-        } catch (error) {
-            alert("Error deleting: " + error.message);
+            await addDoc(collection(db, "episodes"), newEp);
+            msg.textContent = "Episode Uploaded Successfully!";
+            episodeForm.reset();
+        } catch (err) {
+            msg.textContent = "Error: " + err.message;
+            msg.style.color = "red";
         }
-    }
-};
+    });
+}
+
+// --- 6. EDIT ANIME (edit.html) ---
+async function loadEditData() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const animeId = urlParams.get('id');
+    if (!animeId) { window.location.href = "anime-list.html"; return; }
+
+    try {
+        const docRef = doc(db, "anime", animeId);
+        const docSnap = await getDoc(docRef);
+        
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById("editAnimeId").value = animeId;
+            document.getElementById("editTitle").value = data.title;
+            document.getElementById("editType").value = data.type;
+            document.getElementById("editPoster").value = data.coverImageUrl;
+            document.getElementById("editGenres").value = data.genres.join(", ");
+            document.getElementById("editSeasons").value = data.totalSeasons;
+            document.getElementById("editDesc").value = data.description;
+        }
+    } catch (e) { console.error(e); }
+}
+
+const editForm = document.getElementById("editAnimeForm");
+if (editForm) {
+    editForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = document.getElementById("editAnimeId").value;
+        const msg = document.getElementById("editMsg");
+        msg.textContent = "Updating...";
+
+        try {
+            await updateDoc(doc(db, "anime", id), {
+                title: document.getElementById("editTitle").value,
+                type: document.getElementById("editType").value,
+                coverImageUrl: document.getElementById("editPoster").value,
+                genres: document.getElementById("editGenres").value.split(",").map(g => g.trim()),
+                totalSeasons: parseInt(document.getElementById("editSeasons").value),
+                description: document.getElementById("editDesc").value
+            });
+            msg.textContent = "Updated successfully!";
+            setTimeout(() => window.location.href = "anime-list.html", 1000);
+        } catch (err) {
+            msg.textContent = "Error: " + err.message;
+            msg.style.color = "red";
+        }
+    });
+}
