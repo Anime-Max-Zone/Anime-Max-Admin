@@ -24,6 +24,27 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // ============================================================
+// 🔥 SMART URL FORMATTER (GDrive Auto-Converter)
+// ============================================================
+function formatVideoUrl(url) {
+    if (!url) return "";
+    url = url.trim();
+    
+    // Check if it's a Google Drive Link
+    const driveRegex = /(?:drive\.google\.com\/(?:file\/d\/|open\?id=))([a-zA-Z0-9_-]+)/;
+    const match = url.match(driveRegex);
+    
+    if (match && match[1]) {
+        const fileId = match[1];
+        // Convert to Direct Download Link with confirm=t (Bypasses 500MB warning)
+        return `https://drive.google.com/uc?export=download&confirm=t&id=${fileId}`;
+    }
+    
+    // Agar normal MP4 link hai toh waisa hi return karo
+    return url;
+}
+
+// ============================================================
 // 1. AUTHENTICATION & ROUTING
 // ============================================================
 const isLoginPage = window.location.pathname.includes("index.html") || window.location.pathname.endsWith("/");
@@ -98,7 +119,7 @@ window.addAudioRow = (url = "", lang = "Japanese") => {
     const row = document.createElement("div");
     row.className = "dynamic-row";
     row.innerHTML = `
-        <input type="url" placeholder="Audio/Video URL (MP4)" class="a-url" value="${url}">
+        <input type="url" placeholder="Audio/Video URL (MP4 or GDrive)" class="a-url" value="${url}">
         <select class="a-lang">
             <option value="Japanese" ${lang === "Japanese" ? "selected" : ""}>Japanese Audio</option>
             <option value="English" ${lang === "English" ? "selected" : ""}>English Dub</option>
@@ -219,7 +240,6 @@ async function loadAnimeForDropdown(selectId) {
         const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
         select.innerHTML = `<option value="">Select an Anime</option>`;
         
-        // Auto-select if coming from "Add Ep" button in list
         const preSelectedId = new URLSearchParams(window.location.search).get('id');
 
         snap.forEach(d => {
@@ -247,18 +267,28 @@ if(episodeForm) {
         msg.textContent = "Uploading...";
         msg.style.color = "var(--success)";
 
-        // Gather Qualities
+        // Gather Qualities (Auto-format GDrive URLs)
         let videoQualities = [];
         document.querySelectorAll("#qualityContainer .dynamic-row").forEach(row => {
-            const url = row.querySelector(".v-url").value.trim();
-            if (url) videoQualities.push({ src: url, quality: row.querySelector(".v-quality").value });
+            const rawUrl = row.querySelector(".v-url").value;
+            if (rawUrl.trim()) {
+                videoQualities.push({ 
+                    src: formatVideoUrl(rawUrl), 
+                    quality: row.querySelector(".v-quality").value 
+                });
+            }
         });
 
-        // Gather Audio
+        // Gather Audio (Auto-format GDrive URLs)
         let audioTracks = [];
         document.querySelectorAll("#audioContainer .dynamic-row").forEach(row => {
-            const url = row.querySelector(".a-url").value.trim();
-            if (url) audioTracks.push({ src: url, language: row.querySelector(".a-lang").value });
+            const rawUrl = row.querySelector(".a-url").value;
+            if (rawUrl.trim()) {
+                audioTracks.push({ 
+                    src: formatVideoUrl(rawUrl), 
+                    language: row.querySelector(".a-lang").value 
+                });
+            }
         });
 
         // Gather Subtitles
@@ -284,7 +314,6 @@ if(episodeForm) {
             msg.textContent = "Episode Uploaded Successfully!";
             episodeForm.reset();
             
-            // Reset dynamic rows to 1 default row each
             document.getElementById("qualityContainer").innerHTML = "";
             document.getElementById("audioContainer").innerHTML = "";
             document.getElementById("subtitleContainer").innerHTML = "";
@@ -377,18 +406,31 @@ if (editEpisodeForm) {
         msg.textContent = "Updating...";
         msg.style.color = "var(--success)";
 
+        // Gather Qualities (Auto-format GDrive URLs)
         let videoQualities = [];
         document.querySelectorAll("#qualityContainer .dynamic-row").forEach(row => {
-            const url = row.querySelector(".v-url").value.trim();
-            if (url) videoQualities.push({ src: url, quality: row.querySelector(".v-quality").value });
+            const rawUrl = row.querySelector(".v-url").value;
+            if (rawUrl.trim()) {
+                videoQualities.push({ 
+                    src: formatVideoUrl(rawUrl), 
+                    quality: row.querySelector(".v-quality").value 
+                });
+            }
         });
 
+        // Gather Audio (Auto-format GDrive URLs)
         let audioTracks = [];
         document.querySelectorAll("#audioContainer .dynamic-row").forEach(row => {
-            const url = row.querySelector(".a-url").value.trim();
-            if (url) audioTracks.push({ src: url, language: row.querySelector(".a-lang").value });
+            const rawUrl = row.querySelector(".a-url").value;
+            if (rawUrl.trim()) {
+                audioTracks.push({ 
+                    src: formatVideoUrl(rawUrl), 
+                    language: row.querySelector(".a-lang").value 
+                });
+            }
         });
 
+        // Gather Subtitles
         let subtitles = [];
         document.querySelectorAll("#subtitleContainer .dynamic-row").forEach(row => {
             const url = row.querySelector(".s-url").value.trim();
