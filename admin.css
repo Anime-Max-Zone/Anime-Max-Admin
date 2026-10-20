@@ -129,10 +129,27 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
     padding: 2rem 1.5rem; 
 }
 
-.main-content h2 { 
+/* Page Titles */
+.main-content h2, .page-title { 
     margin-bottom: 1.5rem; 
     font-size: 1.5rem;
     color: var(--text);
+}
+
+/* Page Title Row (With Add New Button) */
+.page-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.page-title-row h2 {
+    margin: 0;
+    padding: 0;
+    border: none;
 }
 
 /* ============================================================
@@ -204,6 +221,14 @@ form {
     background: var(--primary-hover); 
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4);
+}
+
+.btn-small {
+    width: auto !important;
+    padding: 0.6rem 1.2rem !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+    text-decoration: none;
 }
 
 .error-msg { 
@@ -381,12 +406,52 @@ form {
 .admin-info h3 { font-size: 1.1rem; margin-bottom: 0.4rem; color: var(--text); }
 .admin-info p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; }
 
+/* Action Buttons Container */
+.admin-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn-action {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.btn-add {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: var(--success);
+    color: var(--success);
+}
+.btn-add:hover {
+    background: var(--success);
+    color: white;
+}
+
+.btn-edit {
+    background: rgba(157, 78, 221, 0.1);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+.btn-edit:hover {
+    background: var(--primary);
+    color: white;
+}
+
 .btn-delete {
     background: rgba(255, 107, 107, 0.1); 
     border: 1px solid var(--danger);
     color: var(--danger); 
-    padding: 0.6rem 1.2rem; 
-    border-radius: 8px; 
+    padding: 0.5rem 1rem; 
+    border-radius: 6px; 
     font-weight: 600;
     transition: all 0.2s;
     text-align: center;
@@ -421,14 +486,17 @@ form {
         height: 140px;
     }
 
-    .admin-card > div {
-        flex-direction: column;
+    /* Mobile me buttons ek row me aayenge */
+    .admin-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
         width: 100%;
+        justify-content: center;
     }
 
-    .btn-delete, .admin-card .btn-primary {
-        width: 100%;
-        margin-top: 0.5rem;
+    .btn-action, .btn-delete {
+        flex: 1;
+        min-width: 80px;
     }
 
     .dynamic-row {
