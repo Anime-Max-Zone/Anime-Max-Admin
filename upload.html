@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Episode — Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="logo">ADMIN PANEL</div>
+            <nav>
+                <a href="anime-list.html" class="nav-btn">Anime List</a>
+                <a href="anime.html" class="nav-btn">Add Anime</a>
+                <a href="upload.html" class="nav-btn active">Upload Episode</a>
+            </nav>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </aside>
+
+        <main class="main-content">
+            <h2>Upload Movie / Episode</h2>
+            <form id="episodeForm">
+                <div class="input-group">
+                    <label>Select Anime</label>
+                    <select id="selectAnimeForEp" required>
+                        <option value="">Loading...</option>
+                    </select>
+                </div>
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label>Season Number</label>
+                        <input type="number" id="epSeason" value="1" min="1" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Episode Number</label>
+                        <input type="number" id="epNumber" value="1" min="1" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Video URL (MP4 or GDrive)</label>
+                    <input type="url" id="epVideoUrl" required placeholder="https://...">
+                </div>
+                <div class="input-group">
+                    <label>Subtitle URL (VTT - Optional)</label>
+                    <input type="url" id="epSubUrl" placeholder="https://...">
+                </div>
+                <button type="submit" class="btn-primary">Upload Episode</button>
+                <p id="episodeMsg" class="success-msg"></p>
+            </form>
+        </main>
+    </div>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
