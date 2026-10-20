@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit — Admin</title>
+    <title>Edit Episode — Admin</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
+    <!-- ================= TOP HEADER ================= -->
     <header class="admin-header">
         <div class="logo">ADMIN PANEL</div>
         <button id="logoutBtn" class="btn-logout-top">Logout</button>
     </header>
 
+    <!-- ================= MAIN CONTENT ================= -->
     <main class="main-content">
         
         <h2 class="page-title">Edit Episode / Video</h2>
         
+        <!-- Selector Box (Anime & Episode Dropdowns) -->
         <div class="dynamic-section selector-box">
             <div class="row-inputs">
                 <div class="input-group">
@@ -35,6 +38,7 @@
             </div>
         </div>
 
+        <!-- Edit Form (Hidden by default) -->
         <form id="editEpisodeForm" style="display: none;">
             <input type="hidden" id="editEpId">
             
@@ -55,6 +59,7 @@
                     <h3>Video Qualities (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addQualityRow()">+ Add Quality</button>
                 </div>
+                <!-- JS will inject existing URLs here with a Delete (×) button -->
                 <div id="qualityContainer"></div>
             </div>
 
@@ -64,6 +69,7 @@
                     <h3>Audio Tracks (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addAudioRow()">+ Add Audio</button>
                 </div>
+                <!-- JS will inject existing URLs here with a Delete (×) button -->
                 <div id="audioContainer"></div>
             </div>
 
@@ -73,33 +79,48 @@
                     <h3>Subtitles (Optional)</h3>
                     <button type="button" class="btn-add-row" onclick="addSubtitleRow()">+ Add Subtitle</button>
                 </div>
+                <!-- JS will inject existing URLs here with a Delete (×) button -->
                 <div id="subtitleContainer"></div>
             </div>
 
             <button type="submit" class="btn-primary">Update Episode</button>
             <p id="editEpMsg" class="success-msg"></p>
         </form>
+        
     </main>
 
+    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
     <nav class="admin-bottom-nav">
         <a href="anime-list.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
             <span>List</span>
         </a>
+        
         <a href="anime.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
             <span>Add Anime</span>
         </a>
+
         <a href="upload.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
             <span>Upload</span>
         </a>
+
         <a href="edit.html" class="nav-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
             <span>Edit</span>
         </a>
     </nav>
 
+    <!-- Admin Script -->
     <script type="module" src="admin.js"></script>
 </body>
 </html>
