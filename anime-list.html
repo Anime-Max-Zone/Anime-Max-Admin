@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anime List — Admin</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">ADMIN PANEL</div>
+            <nav>
+                <a href="anime-list.html" class="nav-btn active">Anime List</a>
+                <a href="anime.html" class="nav-btn">Add Anime</a>
+                <a href="upload.html" class="nav-btn">Upload Episode</a>
+            </nav>
+            <button id="logoutBtn" class="logout-btn">Logout</button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2>All Anime / Movies</h2>
+                <a href="anime.html" class="btn-primary" style="width: auto; padding: 0.8rem 1.5rem; text-decoration: none;">+ Add New</a>
+            </div>
+            <div id="adminAnimeList" class="admin-list">
+                <!-- JS will populate list here -->
+            </div>
+        </main>
+    </div>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
