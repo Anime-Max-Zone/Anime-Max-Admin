@@ -4,20 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login — Anime Max Zone</title>
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- External CSS Link -->
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+
+    <!-- ================= LOGIN SCREEN ================= -->
     <div class="login-container">
         <div class="login-box">
+            
+            <!-- Logo Section -->
+            <div class="login-logo">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 300" width="100%" height="60">
+                    <defs>
+                        <linearGradient id="maxGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#e2a0ff" />
+                            <stop offset="50%" stop-color="#a855f7" />
+                            <stop offset="100%" stop-color="#7e22ce" />
+                        </linearGradient>
+                    </defs>
+                    <g font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="180" letter-spacing="2" dominant-baseline="central">
+                        <text x="50" y="150" fill="#ffffff">ANIME</text>
+                        <text x="740" y="150" fill="url(#maxGradient)">MAX</text>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Login Form -->
             <h2>Admin Login</h2>
-            <p>Enter your credentials to manage anime.</p>
-            <input type="email" id="adminEmail" placeholder="Email Address">
-            <input type="password" id="adminPassword" placeholder="Password">
+            <p>Enter your credentials to manage the platform.</p>
+            
+            <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email">
+            <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password">
+            
             <button id="loginBtn" class="btn-primary">Login</button>
+            
+            <!-- Error Message -->
             <p id="loginError" class="error-msg"></p>
+
+            <!-- Back to website link -->
+            <a href="index.html" class="back-link">&larr; Back to Website</a>
         </div>
     </div>
+
+    <!-- Admin Script (Handles Auth & Redirection) -->
     <script type="module" src="admin.js"></script>
 </body>
 </html>
