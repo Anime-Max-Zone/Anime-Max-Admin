@@ -30,8 +30,10 @@ const isLoginPage = window.location.pathname.includes("index.html") || window.lo
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        // Logged In
         if (isLoginPage) window.location.href = "anime-list.html";
         
+        // Page specific initialization
         if (document.getElementById("adminAnimeList")) loadAnimeList();
         if (document.getElementById("selectAnimeForEp")) loadAnimeForDropdown("selectAnimeForEp");
         
@@ -40,10 +42,12 @@ onAuthStateChanged(auth, (user) => {
             document.getElementById("editSelectAnime").addEventListener("change", loadEpisodesForEdit);
         }
     } else {
+        // Logged Out
         if (!isLoginPage) window.location.href = "index.html";
     }
 });
 
+// Login
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
@@ -64,6 +68,7 @@ if (loginForm) {
     });
 }
 
+// Logout
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) logoutBtn.addEventListener("click", () => signOut(auth));
 
@@ -76,7 +81,7 @@ window.addQualityRow = (url = "", quality = "1080") => {
     const row = document.createElement("div");
     row.className = "dynamic-row";
     row.innerHTML = `
-        <input type="url" placeholder="Video URL (MP4 or GDrive)" class="v-url" value="${url}" required>
+        <input type="url" placeholder="Video URL (MP4 or GDrive)" class="v-url" value="${url}">
         <select class="v-quality">
             <option value="1080" ${quality === "1080" ? "selected" : ""}>1080p HD</option>
             <option value="720" ${quality === "720" ? "selected" : ""}>720p</option>
@@ -121,10 +126,12 @@ window.addSubtitleRow = (url = "", lang = "en") => {
     container.appendChild(row);
 };
 
-window.removeRow = (btn) => { btn.parentElement.remove(); };
+window.removeRow = (btn) => { 
+    btn.parentElement.remove(); 
+};
 
 // ============================================================
-// 3. ADD ANIME
+// 3. ADD ANIME (anime.html)
 // ============================================================
 const animeForm = document.getElementById("animeForm");
 if (animeForm) {
@@ -156,15 +163,20 @@ if (animeForm) {
 }
 
 // ============================================================
-// 4. MANAGE LIST
+// 4. MANAGE LIST (anime-list.html)
 // ============================================================
 async function loadAnimeList() {
     const container = document.getElementById("adminAnimeList");
     if(!container) return;
+    
     try {
         const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
         container.innerHTML = "";
-        if(snap.empty) { container.innerHTML = "<p>No anime found.</p>"; return; }
+        
+        if(snap.empty) { 
+            container.innerHTML = "<p style='color:var(--text-muted); text-align:center;'>No anime found in database.</p>"; 
+            return; 
+        }
 
         snap.forEach(d => {
             const a = d.data();
@@ -182,25 +194,32 @@ async function loadAnimeList() {
                 </div>
             `;
         });
-    } catch (e) { container.innerHTML = "<p>Error loading data.</p>"; }
+    } catch (e) { 
+        container.innerHTML = "<p style='color:var(--danger); text-align:center;'>Error loading data.</p>"; 
+    }
 }
 
 window.deleteAnime = async (id) => {
-    if(confirm("Delete this anime? Episodes will remain in DB but hidden.")) {
-        await deleteDoc(doc(db, "anime", id));
-        loadAnimeList();
+    if(confirm("Are you sure you want to delete this anime?")) {
+        try {
+            await deleteDoc(doc(db, "anime", id));
+            loadAnimeList();
+        } catch(e) { console.error(e); }
     }
 };
 
 // ============================================================
-// 5. UPLOAD EPISODE
+// 5. UPLOAD EPISODE (upload.html)
 // ============================================================
 async function loadAnimeForDropdown(selectId) {
     const select = document.getElementById(selectId);
     if(!select) return;
+    
     try {
         const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
         select.innerHTML = `<option value="">Select an Anime</option>`;
+        
+        // Auto-select if coming from "Add Ep" button in list
         const preSelectedId = new URLSearchParams(window.location.search).get('id');
 
         snap.forEach(d => {
@@ -216,23 +235,33 @@ if(episodeForm) {
         e.preventDefault();
         const msg = document.getElementById("episodeMsg");
         const select = document.getElementById("selectAnimeForEp");
+        
+        if(!select.value) {
+            msg.textContent = "Please select an anime!";
+            msg.style.color = "var(--danger)";
+            return;
+        }
+
         const selectedTitle = select.options[select.selectedIndex].getAttribute("data-title");
         
         msg.textContent = "Uploading...";
         msg.style.color = "var(--success)";
 
+        // Gather Qualities
         let videoQualities = [];
         document.querySelectorAll("#qualityContainer .dynamic-row").forEach(row => {
             const url = row.querySelector(".v-url").value.trim();
             if (url) videoQualities.push({ src: url, quality: row.querySelector(".v-quality").value });
         });
 
+        // Gather Audio
         let audioTracks = [];
         document.querySelectorAll("#audioContainer .dynamic-row").forEach(row => {
             const url = row.querySelector(".a-url").value.trim();
             if (url) audioTracks.push({ src: url, language: row.querySelector(".a-lang").value });
         });
 
+        // Gather Subtitles
         let subtitles = [];
         document.querySelectorAll("#subtitleContainer .dynamic-row").forEach(row => {
             const url = row.querySelector(".s-url").value.trim();
@@ -255,10 +284,13 @@ if(episodeForm) {
             msg.textContent = "Episode Uploaded Successfully!";
             episodeForm.reset();
             
+            // Reset dynamic rows to 1 default row each
             document.getElementById("qualityContainer").innerHTML = "";
             document.getElementById("audioContainer").innerHTML = "";
             document.getElementById("subtitleContainer").innerHTML = "";
-            addQualityRow(); addAudioRow(); addSubtitleRow();
+            addQualityRow(); 
+            addAudioRow(); 
+            addSubtitleRow();
         } catch (err) {
             msg.textContent = "Error: " + err.message;
             msg.style.color = "var(--danger)";
@@ -267,7 +299,7 @@ if(episodeForm) {
 }
 
 // ============================================================
-// 6. EDIT EPISODE
+// 6. EDIT EPISODE (edit.html)
 // ============================================================
 async function loadEpisodesForEdit() {
     const animeId = document.getElementById("editSelectAnime").value;
@@ -277,14 +309,21 @@ async function loadEpisodesForEdit() {
     form.style.display = "none";
     epSelect.innerHTML = `<option value="">Loading...</option>`;
     
-    if (!animeId) { epSelect.innerHTML = `<option value="">Choose Anime First</option>`; epSelect.disabled = true; return; }
+    if (!animeId) { 
+        epSelect.innerHTML = `<option value="">Choose Anime First</option>`; 
+        epSelect.disabled = true; 
+        return; 
+    }
 
     try {
         const q = query(collection(db, "episodes"), where("animeId", "==", animeId));
         const snap = await getDocs(q);
         epSelect.innerHTML = `<option value="">Select Episode</option>`;
         
-        if(snap.empty) { epSelect.innerHTML = `<option value="">No episodes found</option>`; return; }
+        if(snap.empty) { 
+            epSelect.innerHTML = `<option value="">No episodes found</option>`; 
+            return; 
+        }
 
         const episodes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
         episodes.sort((a, b) => a.season - b.season || a.episode - b.episode);
@@ -310,19 +349,19 @@ function loadEditFormData(epId, episodes) {
     document.getElementById("editEpSeason").value = data.season;
     document.getElementById("editEpNumber").value = data.episode;
 
-    // Clear and populate Qualities
+    // Populate Qualities
     document.getElementById("qualityContainer").innerHTML = "";
     if (data.videoQualities && data.videoQualities.length > 0) {
         data.videoQualities.forEach(q => addQualityRow(q.src, q.quality));
     } else { addQualityRow(); }
 
-    // Clear and populate Audio
+    // Populate Audio
     document.getElementById("audioContainer").innerHTML = "";
     if (data.audioTracks && data.audioTracks.length > 0) {
         data.audioTracks.forEach(a => addAudioRow(a.src, a.language));
     } else { addAudioRow(); }
 
-    // Clear and populate Subtitles
+    // Populate Subtitles
     document.getElementById("subtitleContainer").innerHTML = "";
     if (data.subtitles && data.subtitles.length > 0) {
         data.subtitles.forEach(s => addSubtitleRow(s.src, s.language));
