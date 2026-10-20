@@ -38,16 +38,18 @@
             <h2>Admin Login</h2>
             <p>Enter your credentials to manage the platform.</p>
             
-            <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email">
-            <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password">
-            
-            <button id="loginBtn" class="btn-primary">Login</button>
+            <form id="loginForm">
+                <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email" required>
+                <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password" required>
+                
+                <button type="submit" id="loginBtn" class="btn-primary">Login</button>
+            </form>
             
             <!-- Error Message -->
             <p id="loginError" class="error-msg"></p>
 
-            <!-- Back to website link -->
-            <a href="index.html" class="back-link">&larr; Back to Website</a>
+            <!-- Back to website link (Points to your main website) -->
+            <a href="../index.html" class="back-link">&larr; Back to Website</a>
         </div>
     </div>
 
