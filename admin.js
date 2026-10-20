@@ -48,17 +48,26 @@ onAuthStateChanged(auth, (user) => {
 });
 
 // Login / Logout
+const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
-if (loginBtn) {
-    loginBtn.addEventListener("click", async () => {
+const loginError = document.getElementById("loginError");
+
+if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // Form reload rokne ke liye
         const email = document.getElementById("adminEmail").value;
         const pass = document.getElementById("adminPassword").value;
+        
         try {
             loginBtn.textContent = "Logging in...";
+            loginBtn.disabled = true;
+            loginError.textContent = "";
+            
             await signInWithEmailAndPassword(auth, email, pass);
-        } catch (e) {
-            document.getElementById("loginError").textContent = "Invalid credentials!";
+        } catch (err) {
+            loginError.textContent = "Invalid credentials!";
             loginBtn.textContent = "Login";
+            loginBtn.disabled = false;
         }
     });
 }
@@ -158,7 +167,7 @@ async function loadAnimeList() {
         container.innerHTML = "";
         
         if(snap.empty) {
-            container.innerHTML = "<p>No anime found in database.</p>";
+            container.innerHTML = "<p style='color:var(--text-muted); text-align:center;'>No anime found in database.</p>";
             return;
         }
 
@@ -171,16 +180,16 @@ async function loadAnimeList() {
                         <h3>${a.title}</h3>
                         <p>${a.type} • ${a.totalSeasons} Seasons • ${Array.isArray(a.genres) ? a.genres.join(", ") : ''}</p>
                     </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <a href="upload.html?id=${d.id}" class="btn-primary" style="padding: 0.5rem 1rem; width:auto; text-decoration:none; margin:0;">Add Ep</a>
-                        <button class="btn-delete" onclick="deleteAnime('${d.id}')">Delete</button>
+                    <div class="admin-actions">
+                        <a href="upload.html?id=${d.id}" class="btn-action btn-add">+ Add Ep</a>
+                        <button class="btn-action btn-delete" onclick="deleteAnime('${d.id}')">Delete</button>
                     </div>
                 </div>
             `;
         });
     } catch (e) { 
         console.error(e); 
-        container.innerHTML = "<p>Error loading data.</p>";
+        container.innerHTML = "<p style='color:var(--danger);'>Error loading data.</p>";
     }
 }
 
@@ -203,8 +212,14 @@ async function loadAnimeForDropdown(selectId) {
     try {
         const snap = await getDocs(query(collection(db, "anime"), orderBy("createdAt", "desc")));
         select.innerHTML = `<option value="">Select an Anime</option>`;
+        
+        // Check if URL has ?id= (for auto-selecting anime from list page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const preSelectedId = urlParams.get('id');
+
         snap.forEach(d => {
-            select.innerHTML += `<option value="${d.id}" data-title="${d.data().title}">${d.data().title}</option>`;
+            const isSelected = (d.id === preSelectedId) ? "selected" : "";
+            select.innerHTML += `<option value="${d.id}" data-title="${d.data().title}" ${isSelected}>${d.data().title}</option>`;
         });
     } catch (e) { console.error(e); }
 }
@@ -215,6 +230,13 @@ if(episodeForm) {
         e.preventDefault();
         const msg = document.getElementById("episodeMsg");
         const select = document.getElementById("selectAnimeForEp");
+        
+        if(!select.value) {
+            msg.textContent = "Please select an anime!";
+            msg.style.color = "var(--danger)";
+            return;
+        }
+
         const selectedTitle = select.options[select.selectedIndex].getAttribute("data-title");
         
         msg.textContent = "Uploading...";
@@ -251,8 +273,8 @@ if(episodeForm) {
         const newEp = {
             animeId: select.value,
             animeTitle: selectedTitle,
-            season: parseInt(document.getElementById("epSeason").value),
-            episode: parseInt(document.getElementById("epNumber").value),
+            season: parseInt(document.getElementById("epSeason").value) || 1,
+            episode: parseInt(document.getElementById("epNumber").value) || 1,
             videoSources: videoSources,
             subtitles: subtitles,
             createdAt: new Date().toISOString()
@@ -302,25 +324,27 @@ async function loadEpisodesForEdit() {
             return;
         }
 
-        epSelect.disabled = false;
-        snap.forEach(d => {
-            const ep = d.data();
-            epSelect.innerHTML += `<option value="${d.id}">S${ep.season} Ep${ep.episode}</option>`;
+        // Sort episodes by season then episode
+        const episodes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        episodes.sort((a, b) => a.season - b.season || a.episode - b.episode);
+
+        episodes.forEach(ep => {
+            epSelect.innerHTML += `<option value="${ep.id}">S${ep.season} Ep${ep.episode}</option>`;
         });
         
-        epSelect.onchange = () => loadEditFormData(epSelect.value, snap);
+        epSelect.disabled = false;
+        epSelect.onchange = () => loadEditFormData(epSelect.value, episodes);
         
     } catch (err) { console.error(err); }
 }
 
-function loadEditFormData(epId, snap) {
+function loadEditFormData(epId, episodes) {
     const form = document.getElementById("editEpisodeForm");
     if(!epId) { form.style.display = "none"; return; }
     
-    const docSnap = snap.docs.find(d => d.id === epId);
-    if(!docSnap) return;
+    const data = episodes.find(e => e.id === epId);
+    if(!data) return;
     
-    const data = docSnap.data();
     form.style.display = "block";
     document.getElementById("editEpId").value = epId;
     document.getElementById("editEpSeason").value = data.season;
@@ -415,8 +439,8 @@ if (editEpisodeForm) {
 
         try {
             await updateDoc(doc(db, "episodes", id), {
-                season: parseInt(document.getElementById("editEpSeason").value),
-                episode: parseInt(document.getElementById("editEpNumber").value),
+                season: parseInt(document.getElementById("editEpSeason").value) || 1,
+                episode: parseInt(document.getElementById("editEpNumber").value) || 1,
                 videoSources: videoSources,
                 subtitles: subtitles
             });
