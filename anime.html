@@ -8,52 +8,94 @@
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-    <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="logo">ADMIN PANEL</div>
-            <nav>
-                <a href="anime-list.html" class="nav-btn">Anime List</a>
-                <a href="anime.html" class="nav-btn active">Add Anime</a>
-                <a href="upload.html" class="nav-btn">Upload Episode</a>
-            </nav>
-            <button id="logoutBtn" class="logout-btn">Logout</button>
-        </aside>
 
-        <main class="main-content">
-            <h2>Add New Anime / Movie</h2>
-            <form id="animeForm">
-                <div class="input-group">
-                    <label>Title</label>
-                    <input type="text" id="animeTitle" required placeholder="e.g. Naruto">
-                </div>
-                <div class="input-group">
-                    <label>Type</label>
-                    <select id="animeType">
-                        <option value="series">Series</option>
-                        <option value="movie">Movie</option>
-                    </select>
-                </div>
-                <div class="input-group">
-                    <label>Poster Image URL</label>
-                    <input type="url" id="animePoster" required placeholder="https://...">
-                </div>
-                <div class="input-group">
-                    <label>Genres (Comma separated)</label>
-                    <input type="text" id="animeGenres" required placeholder="Action, Fantasy">
-                </div>
-                <div class="input-group">
-                    <label>Total Seasons (For Series)</label>
-                    <input type="number" id="animeSeasons" value="1" min="1">
-                </div>
-                <div class="input-group">
-                    <label>Description</label>
-                    <textarea id="animeDesc" rows="4" required></textarea>
-                </div>
-                <button type="submit" class="btn-primary">Save Anime</button>
-                <p id="animeMsg" class="success-msg"></p>
-            </form>
-        </main>
-    </div>
+    <!-- ================= TOP HEADER ================= -->
+    <header class="admin-header">
+        <div class="logo">ADMIN PANEL</div>
+        <button id="logoutBtn" class="btn-logout-top">Logout</button>
+    </header>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+        
+        <h2 style="border: none; margin-bottom: 1.5rem; padding: 0;">Add New Anime / Movie</h2>
+        
+        <form id="animeForm">
+            <div class="input-group">
+                <label>Title</label>
+                <input type="text" id="animeTitle" required placeholder="e.g. Naruto">
+            </div>
+            
+            <div class="input-group">
+                <label>Type</label>
+                <select id="animeType">
+                    <option value="series">Series</option>
+                    <option value="movie">Movie</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label>Poster Image URL</label>
+                <input type="url" id="animePoster" required placeholder="https://...">
+            </div>
+            
+            <div class="input-group">
+                <label>Genres (Comma separated)</label>
+                <input type="text" id="animeGenres" required placeholder="Action, Fantasy">
+            </div>
+            
+            <div class="input-group">
+                <label>Total Seasons (For Series)</label>
+                <input type="number" id="animeSeasons" value="1" min="1">
+            </div>
+            
+            <div class="input-group">
+                <label>Description</label>
+                <textarea id="animeDesc" rows="4" required placeholder="Write a brief synopsis..."></textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary">Save Anime</button>
+            <p id="animeMsg" class="success-msg"></p>
+        </form>
+        
+    </main>
+
+    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
+    <nav class="admin-bottom-nav">
+        <!-- Anime List -->
+        <a href="anime-list.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+            <span>List</span>
+        </a>
+        
+        <!-- Add Anime (Active) -->
+        <a href="anime.html" class="nav-item active">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Add Anime</span>
+        </a>
+
+        <!-- Upload Episode -->
+        <a href="upload.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            <span>Upload</span>
+        </a>
+
+        <!-- Edit Episode -->
+        <a href="edit.html" class="nav-item">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+        </a>
+    </nav>
+
+    <!-- Admin Script -->
     <script type="module" src="admin.js"></script>
 </body>
 </html>
