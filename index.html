@@ -2,58 +2,208 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#080611"
+    >
+
+    <meta
+        name="robots"
+        content="noindex, nofollow, noarchive"
+    >
+
     <title>Admin Login — Anime Max Zone</title>
-    
+
+    <meta
+        name="description"
+        content="Secure administrator login for Anime Max Zone."
+    >
+
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="favicon.png">
-    
-    <!-- External CSS Link -->
-    <link rel="stylesheet" href="admin.css">
+    <link
+        rel="icon"
+        type="image/png"
+        href="favicon.png"
+    >
+
+    <!-- Admin Stylesheet -->
+    <link
+        rel="stylesheet"
+        href="admin.css"
+    >
 </head>
+
 <body>
 
     <!-- ================= LOGIN SCREEN ================= -->
-    <div class="login-container">
-        <div class="login-box">
-            
-            <!-- Logo Section -->
+
+    <main class="login-container">
+
+        <section
+            class="login-box"
+            aria-labelledby="loginHeading"
+        >
+
+            <!-- Logo -->
             <div class="login-logo">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 300" width="100%" height="60">
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 1500 300"
+                    width="100%"
+                    height="60"
+                    role="img"
+                    aria-label="Anime Max Zone"
+                >
+
                     <defs>
-                        <linearGradient id="maxGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#e2a0ff" />
-                            <stop offset="50%" stop-color="#a855f7" />
-                            <stop offset="100%" stop-color="#7e22ce" />
+
+                        <linearGradient
+                            id="maxGradient"
+                            x1="0%"
+                            y1="0%"
+                            x2="0%"
+                            y2="100%"
+                        >
+                            <stop
+                                offset="0%"
+                                stop-color="#e2a0ff"
+                            />
+
+                            <stop
+                                offset="50%"
+                                stop-color="#a855f7"
+                            />
+
+                            <stop
+                                offset="100%"
+                                stop-color="#7e22ce"
+                            />
                         </linearGradient>
+
                     </defs>
-                    <g font-family="'Arial Black', 'Impact', sans-serif" font-weight="900" font-size="180" letter-spacing="2" dominant-baseline="central">
-                        <text x="50" y="150" fill="#ffffff">ANIME</text>
-                        <text x="740" y="150" fill="url(#maxGradient)">MAX</text>
+
+                    <g
+                        font-family="'Arial Black', Impact, sans-serif"
+                        font-weight="900"
+                        font-size="180"
+                        letter-spacing="2"
+                        dominant-baseline="central"
+                    >
+
+                        <text
+                            x="50"
+                            y="150"
+                            fill="#ffffff"
+                        >ANIME</text>
+
+                        <text
+                            x="740"
+                            y="150"
+                            fill="url(#maxGradient)"
+                        >MAX</text>
+
                     </g>
+
                 </svg>
+
             </div>
 
+            <!-- Heading -->
+            <h1 id="loginHeading">
+                Admin Login
+            </h1>
+
+            <p>
+                Sign in with your authorized administrator account.
+            </p>
+
             <!-- Login Form -->
-            <h2>Admin Login</h2>
-            <p>Enter your credentials to manage the platform.</p>
-            
-            <form id="loginForm">
-                <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email" required>
-                <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password" required>
-                
-                <button type="submit" id="loginBtn" class="btn-primary">Login</button>
+            <form
+                id="loginForm"
+                autocomplete="on"
+                novalidate
+            >
+
+                <div class="form-group">
+
+                    <label for="adminEmail">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="adminEmail"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="username"
+                        inputmode="email"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="adminPassword">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="adminPassword"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+
+                </div>
+
+                <!-- Login Button -->
+                <button
+                    type="submit"
+                    id="loginBtn"
+                    class="btn-primary"
+                >
+                    Login
+                </button>
+
             </form>
-            
-            <!-- Error Message -->
-            <p id="loginError" class="error-msg"></p>
 
-            <!-- Back to website link (Points to your main website) -->
-            <a href="../index.html" class="back-link">&larr; Back to Website</a>
-        </div>
-    </div>
+            <!-- Authentication Status / Error -->
+            <p
+                id="loginError"
+                class="error-msg"
+                role="alert"
+                aria-live="polite"
+            ></p>
 
-    <!-- Admin Script (Handles Auth & Redirection) -->
-    <script type="module" src="admin.js"></script>
+            <!-- Back to Website -->
+            <a
+                href="../index.html"
+                class="back-link"
+            >
+                &larr; Back to Website
+            </a>
+
+        </section>
+
+    </main>
+
+    <!-- Firebase Authentication + Admin Verification -->
+    <script
+        type="module"
+        src="admin.js"
+    ></script>
+
 </body>
 </html>
