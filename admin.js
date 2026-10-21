@@ -1,8 +1,18 @@
 /* ============================================================
    ANIME MAX ZONE — ADMIN PANEL
    File: admin.js
-   Firebase Authentication + Realtime Database
-   Admin UID verification
+
+   Firebase Authentication
+   Realtime Database
+   Admin UID Verification
+   Anime Management
+   Episode Upload / Edit / Delete
+   Video Qualities / Audio Tracks / Subtitles
+
+   DATABASE STRUCTURE:
+   admins/{uid}: true
+   anime/{animeId}
+   anime/{animeId}/episodes/{episodeId}
    ============================================================ */
 
 import {
@@ -27,9 +37,9 @@ import {
   remove
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ============================================================
-// FIREBASE CONFIG
-// ============================================================
+/* ============================================================
+   1. FIREBASE CONFIGURATION
+   ============================================================ */
 
 const firebaseConfig = {
   apiKey: "AIzaSyCpfrluxsBhnz48ve9RykIy1IxzbBfk7dA",
@@ -50,28 +60,31 @@ const app = getApps().length
 const auth = getAuth(app);
 const db = getDatabase(app);
 
-// ============================================================
-// HELPERS
-// ============================================================
+/* ============================================================
+   2. HELPERS
+   ============================================================ */
 
 const $ = (id) => document.getElementById(id);
-
-const isLoginPage =
-  /\/index\.html$|\/$/.test(window.location.pathname);
 
 let authorizedAdminUid = null;
 let authInitialized = false;
 let authCheckInProgress = false;
+let authCheckVersion = 0;
 
-function setMessage(element, message, type = "success") {
+const currentPath = window.location.pathname;
+
+const isLoginPage =
+  /\/index\.html$|\/$/.test(currentPath);
+
+function setMessage(element, message, type = "info") {
   if (!element) return;
 
   element.textContent = message;
 
   const colors = {
     success: "var(--success, #22c55e)",
-    error: "var(--danger, #ef4444)",
-    info: "var(--text-muted, #9ca3af)"
+    error: "var(--danger, #ff647c)",
+    info: "var(--text-muted, #a1a1b5)"
   };
 
   element.style.color = colors[type] || colors.info;
@@ -82,7 +95,10 @@ function getValue(id) {
 }
 
 function safeText(value, fallback = "") {
-  if (typeof value === "string" || typeof value === "number") {
+  if (
+    typeof value === "string" ||
+    typeof value === "number"
+  ) {
     return String(value).trim() || fallback;
   }
 
@@ -90,9 +106,13 @@ function safeText(value, fallback = "") {
 }
 
 function getNumber(id, fallback = 1) {
-  const value = Number.parseInt(getValue(id), 10);
+  const raw = getValue(id);
 
-  return Number.isFinite(value) && value > 0
+  if (!raw) return fallback;
+
+  const value = Number(raw);
+
+  return Number.isSafeInteger(value) && value > 0
     ? value
     : fallback;
 }
@@ -101,31 +121,54 @@ function isValidHttpUrl(value) {
   try {
     const url = new URL(value);
 
-    return url.protocol === "https:" ||
-      url.protocol === "http:";
+    return (
+      url.protocol === "https:" ||
+      url.protocol === "http:"
+    );
   } catch {
     return false;
   }
 }
 
 function requireAuthorizedAdmin() {
-  if (!auth.currentUser || !authorizedAdminUid) {
+  const user = auth.currentUser;
+
+  if (
+    !user ||
+    !authorizedAdminUid ||
+    user.uid !== authorizedAdminUid
+  ) {
     throw new Error(
       "Admin authorization required. Please log in again."
     );
   }
 
-  if (auth.currentUser.uid !== authorizedAdminUid) {
-    throw new Error("Unauthorized account.");
-  }
+  return user;
 }
 
 function showError(element, error, fallback = "Operation failed.") {
   console.error(fallback, error);
 
-  const message = error?.code === "PERMISSION_DENIED"
-    ? "Permission denied. Check your Realtime Database Rules."
-    : error?.message || fallback;
+  let message = error?.message || fallback;
+
+  if (
+    error?.code === "PERMISSION_DENIED" ||
+    error?.code === "database/permission-denied"
+  ) {
+    message =
+      "Database permission denied. Check Firebase Realtime Database Rules.";
+  } else if (
+    error?.code === "auth/invalid-credential" ||
+    error?.code === "auth/wrong-password" ||
+    error?.code === "auth/user-not-found" ||
+    error?.code === "auth/invalid-email"
+  ) {
+    message = "Invalid email or password.";
+  } else if (
+    error?.code === "auth/too-many-requests"
+  ) {
+    message = "Too many attempts. Please try again later.";
+  }
 
   setMessage(element, message, "error");
 }
@@ -134,14 +177,32 @@ function getAnimeTitle(anime) {
   return safeText(anime?.title, "Untitled Anime");
 }
 
-// ============================================================
-// ADMIN VERIFICATION
-//
-// Realtime Database:
-//
-// admins/
-//   FIREBASE_AUTH_UID: true
-// ============================================================
+function getAnimePoster(anime) {
+  const url = safeText(
+    anime?.coverImageUrl || anime?.posterUrl
+  );
+
+  return isValidHttpUrl(url) ? url : "";
+}
+
+function createElement(tag, className, text) {
+  const element = document.createElement(tag);
+
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+
+  return element;
+}
+
+/* ============================================================
+   3. ADMIN UID VERIFICATION
+
+   RTDB:
+   admins/
+     FIREBASE_AUTH_UID: true
+
+   Value must be boolean true.
+   ============================================================ */
 
 async function verifyAdmin(user) {
   if (!user) return false;
@@ -151,19 +212,22 @@ async function verifyAdmin(user) {
       ref(db, `admins/${user.uid}`)
     );
 
-    return snapshot.exists() && snapshot.val() === true;
+    return (
+      snapshot.exists() &&
+      snapshot.val() === true
+    );
   } catch (error) {
     console.error("Admin verification failed:", error);
     return false;
   }
 }
 
-// ============================================================
-// AUTH STATE
-// ============================================================
+/* ============================================================
+   4. AUTH STATE MANAGEMENT
+   ============================================================ */
 
 onAuthStateChanged(auth, async (user) => {
-  if (authCheckInProgress) return;
+  const version = ++authCheckVersion;
 
   authCheckInProgress = true;
   authorizedAdminUid = null;
@@ -181,13 +245,17 @@ onAuthStateChanged(auth, async (user) => {
 
     const isAdmin = await verifyAdmin(user);
 
+    if (version !== authCheckVersion) return;
+
     if (!isAdmin) {
       await signOut(auth);
 
       authInitialized = true;
 
       if (!isLoginPage) {
-        window.location.replace("index.html?error=unauthorized");
+        window.location.replace(
+          "index.html?error=unauthorized"
+        );
       } else {
         setMessage(
           $("loginError"),
@@ -207,36 +275,71 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
 
-    if ($("adminAnimeList")) {
-      await loadAnimeList();
-    }
-
-    if ($("selectAnimeForEp")) {
-      await loadAnimeForDropdown("selectAnimeForEp");
-    }
-
-    if ($("editSelectAnime")) {
-      await loadAnimeForDropdown("editSelectAnime");
-
-      $("editSelectAnime").addEventListener(
-        "change",
-        loadEpisodesForEdit
-      );
-    }
+    await initializeAdminPage();
   } catch (error) {
+    if (version !== authCheckVersion) return;
+
     showError(
-      $("loginError") || $("animeMsg") || $("episodeMsg"),
+      $("loginError") ||
+      $("animeMsg") ||
+      $("episodeMsg") ||
+      $("editEpMsg"),
       error,
       "Unable to initialize the admin panel."
     );
   } finally {
-    authCheckInProgress = false;
+    if (version === authCheckVersion) {
+      authCheckInProgress = false;
+    }
   }
 });
 
-// ============================================================
-// LOGIN
-// ============================================================
+/* ============================================================
+   5. INITIALIZE CURRENT PAGE
+   ============================================================ */
+
+async function initializeAdminPage() {
+  requireAuthorizedAdmin();
+
+  if ($("adminAnimeList")) {
+    await loadAnimeList();
+  }
+
+  if ($("selectAnimeForEp")) {
+    await loadAnimeForDropdown("selectAnimeForEp");
+  }
+
+  if ($("editSelectAnime")) {
+    const select = $("editSelectAnime");
+
+    select.addEventListener(
+      "change",
+      loadEpisodesForEdit
+    );
+
+    await loadAnimeForDropdown("editSelectAnime");
+  }
+
+  if ($("episodeForm")) {
+    resetMediaRows();
+  }
+
+  if ($("editEpisodeForm")) {
+    $("editEpisodeForm").style.display = "none";
+  }
+
+  // Support upload.html?id=ANIME_ID.
+  const requestedAnimeId =
+    new URLSearchParams(window.location.search).get("id");
+
+  if (requestedAnimeId && $("selectAnimeForEp")) {
+    $("selectAnimeForEp").value = requestedAnimeId;
+  }
+}
+
+/* ============================================================
+   6. LOGIN
+   ============================================================ */
 
 $("loginForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -252,7 +355,6 @@ $("loginForm")?.addEventListener("submit", async (event) => {
       "Enter your email and password.",
       "error"
     );
-
     return;
   }
 
@@ -273,6 +375,8 @@ $("loginForm")?.addEventListener("submit", async (event) => {
     const isAdmin = await verifyAdmin(credential.user);
 
     if (!isAdmin) {
+      authorizedAdminUid = null;
+
       await signOut(auth);
 
       setMessage(
@@ -291,7 +395,7 @@ $("loginForm")?.addEventListener("submit", async (event) => {
     showError(
       errorElement,
       error,
-      "Login failed. Check your credentials."
+      "Login failed."
     );
   } finally {
     if (button) {
@@ -301,9 +405,9 @@ $("loginForm")?.addEventListener("submit", async (event) => {
   }
 });
 
-// ============================================================
-// LOGOUT
-// ============================================================
+/* ============================================================
+   7. LOGOUT
+   ============================================================ */
 
 $("logoutBtn")?.addEventListener("click", async () => {
   authorizedAdminUid = null;
@@ -313,13 +417,21 @@ $("logoutBtn")?.addEventListener("click", async () => {
     window.location.replace("index.html");
   } catch (error) {
     console.error("Logout failed:", error);
+
     alert("Unable to log out. Please try again.");
   }
 });
 
-// ============================================================
-// GOOGLE DRIVE URL FORMATTER
-// ============================================================
+/* ============================================================
+   8. VIDEO URL FORMATTER
+
+   Converts common Google Drive share URLs into:
+   https://drive.google.com/uc?export=download&id=FILE_ID
+
+   NOTE:
+   This URL format does not guarantee HTML5 video streaming.
+   The Drive file must be publicly accessible and compatible.
+   ============================================================ */
 
 function formatVideoUrl(value) {
   const url = safeText(value);
@@ -341,7 +453,12 @@ function formatVideoUrl(value) {
     throw new Error("Only HTTP and HTTPS URLs are supported.");
   }
 
-  if (parsed.hostname.toLowerCase() !== "drive.google.com") {
+  const host = parsed.hostname.toLowerCase();
+
+  if (
+    host !== "drive.google.com" &&
+    host !== "www.drive.google.com"
+  ) {
     return url;
   }
 
@@ -359,7 +476,11 @@ function formatVideoUrl(value) {
     fileId = parsed.searchParams.get("id") || "";
   }
 
-  if (!fileId) return url;
+  if (!fileId) {
+    throw new Error(
+      "Could not find a Google Drive file ID in this URL."
+    );
+  }
 
   return (
     "https://drive.google.com/uc?export=download&id=" +
@@ -367,61 +488,9 @@ function formatVideoUrl(value) {
   );
 }
 
-// ============================================================
-// DYNAMIC MEDIA ROWS
-// ============================================================
-
-function createDynamicRow({
-  containerId,
-  inputClass,
-  inputPlaceholder,
-  inputValue = "",
-  selectClass,
-  options,
-  selectedValue
-}) {
-  const container = $(containerId);
-
-  if (!container) return;
-
-  const row = document.createElement("div");
-  row.className = "dynamic-row";
-
-  const input = document.createElement("input");
-  input.type = "url";
-  input.className = inputClass;
-  input.placeholder = inputPlaceholder;
-  input.value = inputValue;
-  input.autocomplete = "url";
-
-  const select = document.createElement("select");
-  select.className = selectClass;
-
-  options.forEach((option) => {
-    const item = document.createElement("option");
-
-    item.value = option.value;
-    item.textContent = option.label;
-    item.selected =
-      option.value === String(selectedValue);
-
-    select.appendChild(item);
-  });
-
-  const removeButton = document.createElement("button");
-
-  removeButton.type = "button";
-  removeButton.className = "btn-remove-row";
-  removeButton.textContent = "×";
-  removeButton.setAttribute("aria-label", "Remove row");
-
-  removeButton.addEventListener("click", () => {
-    row.remove();
-  });
-
-  row.append(input, select, removeButton);
-  container.appendChild(row);
-}
+/* ============================================================
+   9. DYNAMIC MEDIA ROWS
+   ============================================================ */
 
 const QUALITY_OPTIONS = [
   { value: "1080", label: "1080p HD" },
@@ -441,7 +510,72 @@ const SUBTITLE_OPTIONS = [
   { value: "ur", label: "Urdu" }
 ];
 
-window.addQualityRow = (url = "", quality = "1080") => {
+function createDynamicRow({
+  containerId,
+  inputClass,
+  inputPlaceholder,
+  inputValue = "",
+  selectClass,
+  options,
+  selectedValue
+}) {
+  const container = $(containerId);
+
+  if (!container) return;
+
+  const row = createElement("div", "dynamic-row");
+
+  const input = document.createElement("input");
+
+  input.type = "url";
+  input.className = inputClass;
+  input.placeholder = inputPlaceholder;
+  input.value = inputValue;
+  input.autocomplete = "url";
+  input.spellcheck = false;
+
+  const select = document.createElement("select");
+
+  select.className = selectClass;
+
+  options.forEach((option) => {
+    const item = document.createElement("option");
+
+    item.value = option.value;
+    item.textContent = option.label;
+
+    select.appendChild(item);
+  });
+
+  const wantedValue = String(selectedValue ?? "");
+
+  if (
+    wantedValue &&
+    options.some((option) => option.value === wantedValue)
+  ) {
+    select.value = wantedValue;
+  }
+
+  const removeButton = document.createElement("button");
+
+  removeButton.type = "button";
+  removeButton.className = "btn-remove-row";
+  removeButton.textContent = "×";
+  removeButton.setAttribute("aria-label", "Remove row");
+  removeButton.title = "Remove row";
+
+  removeButton.addEventListener("click", () => {
+    row.remove();
+  });
+
+  row.append(input, select, removeButton);
+  container.appendChild(row);
+}
+
+window.addQualityRow = (
+  url = "",
+  quality = "1080"
+) => {
   createDynamicRow({
     containerId: "qualityContainer",
     inputClass: "v-url",
@@ -453,11 +587,14 @@ window.addQualityRow = (url = "", quality = "1080") => {
   });
 };
 
-window.addAudioRow = (url = "", lang = "Japanese") => {
+window.addAudioRow = (
+  url = "",
+  lang = "Japanese"
+) => {
   createDynamicRow({
     containerId: "audioContainer",
     inputClass: "a-url",
-    inputPlaceholder: "Audio/Video URL",
+    inputPlaceholder: "Audio/video URL",
     inputValue: url,
     selectClass: "a-lang",
     options: AUDIO_OPTIONS,
@@ -465,7 +602,10 @@ window.addAudioRow = (url = "", lang = "Japanese") => {
   });
 };
 
-window.addSubtitleRow = (url = "", lang = "en") => {
+window.addSubtitleRow = (
+  url = "",
+  lang = "en"
+) => {
   createDynamicRow({
     containerId: "subtitleContainer",
     inputClass: "s-url",
@@ -481,9 +621,9 @@ window.removeRow = (button) => {
   button?.closest(".dynamic-row")?.remove();
 };
 
-// ============================================================
-// COLLECT MEDIA DATA
-// ============================================================
+/* ============================================================
+   10. COLLECT MEDIA DATA
+   ============================================================ */
 
 function collectRows(
   containerId,
@@ -502,24 +642,32 @@ function collectRows(
       const selected =
         row.querySelector(selectSelector)?.value || "";
 
+      // Empty optional rows are ignored.
       if (!rawUrl) return;
 
       if (!isValidHttpUrl(rawUrl)) {
         throw new Error(`Invalid ${type} URL.`);
       }
 
-      const src = type === "subtitle"
-        ? rawUrl
-        : formatVideoUrl(rawUrl);
+      if (type === "subtitle") {
+        result.push({
+          src: rawUrl,
+          language: selected
+        });
+
+        return;
+      }
+
+      const formattedUrl = formatVideoUrl(rawUrl);
 
       if (type === "quality") {
         result.push({
-          src,
+          src: formattedUrl,
           quality: selected
         });
       } else {
         result.push({
-          src,
+          src: formattedUrl,
           language: selected
         });
       }
@@ -563,26 +711,30 @@ function resetMediaRows() {
   window.addSubtitleRow();
 }
 
-// ============================================================
-// ANIME DATA PATH
-//
-// /anime/{animeId}
-// ============================================================
-
-// ============================================================
-// ADD ANIME — anime.html
-// ============================================================
+/* ============================================================
+   11. ADD ANIME
+   ============================================================ */
 
 $("animeForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const message = $("animeMsg");
+  const button = $("animeForm")?.querySelector(
+    'button[type="submit"], input[type="submit"]'
+  );
+
+  if (button) button.disabled = true;
 
   try {
     requireAuthorizedAdmin();
 
     const title = getValue("animeTitle");
     const poster = getValue("animePoster");
+    const type = getValue("animeType");
+    const genres = getValue("animeGenres")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
 
     if (!title) {
       throw new Error("Anime title is required.");
@@ -592,16 +744,11 @@ $("animeForm")?.addEventListener("submit", async (event) => {
       throw new Error("Enter a valid poster image URL.");
     }
 
-    const genres = getValue("animeGenres")
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-
     const animeRef = push(ref(db, "anime"));
 
     const animeData = {
       title,
-      type: getValue("animeType"),
+      type,
       coverImageUrl: poster,
       posterUrl: poster,
       genres,
@@ -621,17 +768,21 @@ $("animeForm")?.addEventListener("submit", async (event) => {
       "success"
     );
 
+    $("animeForm").reset();
+
     setTimeout(() => {
       window.location.href = "anime-list.html";
-    }, 800);
+    }, 700);
   } catch (error) {
     showError(message, error, "Anime save failed.");
+  } finally {
+    if (button) button.disabled = false;
   }
 });
 
-// ============================================================
-// LOAD ANIME LIST
-// ============================================================
+/* ============================================================
+   12. LOAD ANIME LIST
+   ============================================================ */
 
 async function loadAnimeList() {
   requireAuthorizedAdmin();
@@ -640,29 +791,41 @@ async function loadAnimeList() {
 
   if (!container) return;
 
-  container.textContent = "Loading anime...";
+  container.replaceChildren();
+
+  container.appendChild(
+    createElement("p", "loading", "Loading anime...")
+  );
 
   try {
     const snapshot = await get(ref(db, "anime"));
 
+    requireAuthorizedAdmin();
+
     container.replaceChildren();
 
     if (!snapshot.exists()) {
-      const p = document.createElement("p");
+      container.appendChild(
+        createElement(
+          "p",
+          "empty-state",
+          "No anime found. Add your first anime."
+        )
+      );
 
-      p.className = "empty-state";
-      p.textContent = "No anime found in the database.";
-
-      container.appendChild(p);
       return;
     }
 
     const animeItems = [];
 
     snapshot.forEach((child) => {
+      const value = child.val();
+
+      if (!value || typeof value !== "object") return;
+
       animeItems.push({
         id: child.key,
-        ...child.val()
+        ...value
       });
     });
 
@@ -673,29 +836,32 @@ async function loadAnimeList() {
     );
 
     animeItems.forEach((anime) => {
-      const card = document.createElement("div");
-      card.className = "admin-card";
+      const card = createElement("div", "admin-card");
 
       const image = document.createElement("img");
 
-      const poster = safeText(
-        anime.coverImageUrl || anime.posterUrl
-      );
+      const poster = getAnimePoster(anime);
 
-      image.src = isValidHttpUrl(poster)
-        ? poster
-        : "https://placehold.co/70x100?text=Anime";
+      image.src = poster ||
+        "https://placehold.co/100x140/151522/ffffff?text=Anime";
 
       image.alt = getAnimeTitle(anime);
       image.loading = "lazy";
 
-      const info = document.createElement("div");
-      info.className = "admin-info";
+      image.addEventListener("error", () => {
+        image.src =
+          "https://placehold.co/100x140/151522/ffffff?text=Anime";
+      }, { once: true });
 
-      const heading = document.createElement("h3");
-      heading.textContent = getAnimeTitle(anime);
+      const info = createElement("div", "admin-info");
 
-      const details = document.createElement("p");
+      const heading = createElement(
+        "h3",
+        "",
+        getAnimeTitle(anime)
+      );
+
+      const details = createElement("p");
 
       const genres = Array.isArray(anime.genres)
         ? anime.genres.join(", ")
@@ -703,14 +869,27 @@ async function loadAnimeList() {
 
       details.textContent = [
         safeText(anime.type, "Anime"),
-        `${Number(anime.totalSeasons) || 1} Seasons`,
+        `${Number(anime.totalSeasons) || 1} Season(s)`,
         genres
       ].filter(Boolean).join(" • ");
 
+      const description = safeText(anime.description);
+
       info.append(heading, details);
 
-      const actions = document.createElement("div");
-      actions.className = "admin-actions";
+      if (description) {
+        const shortDescription = createElement(
+          "p",
+          "",
+          description.length > 110
+            ? `${description.slice(0, 110)}…`
+            : description
+        );
+
+        info.appendChild(shortDescription);
+      }
+
+      const actions = createElement("div", "admin-actions");
 
       const addEpisode = document.createElement("a");
 
@@ -719,6 +898,14 @@ async function loadAnimeList() {
 
       addEpisode.className = "btn-action btn-add";
       addEpisode.textContent = "+ Add Ep";
+
+      const editAnime = document.createElement("a");
+
+      editAnime.href =
+        `edit.html?id=${encodeURIComponent(anime.id)}`;
+
+      editAnime.className = "btn-action btn-edit";
+      editAnime.textContent = "Edit Ep";
 
       const deleteButton = document.createElement("button");
 
@@ -730,7 +917,7 @@ async function loadAnimeList() {
         window.deleteAnime(anime.id);
       });
 
-      actions.append(addEpisode, deleteButton);
+      actions.append(addEpisode, editAnime, deleteButton);
       card.append(image, info, actions);
 
       container.appendChild(card);
@@ -744,9 +931,9 @@ async function loadAnimeList() {
   }
 }
 
-// ============================================================
-// DELETE ANIME AND ITS NESTED EPISODES
-// ============================================================
+/* ============================================================
+   13. DELETE ANIME AND ITS NESTED EPISODES
+   ============================================================ */
 
 window.deleteAnime = async (animeId) => {
   if (!animeId) return;
@@ -754,13 +941,11 @@ window.deleteAnime = async (animeId) => {
   try {
     requireAuthorizedAdmin();
 
-    if (
-      !confirm(
-        "Delete this anime and all its episodes? This cannot be undone."
-      )
-    ) {
-      return;
-    }
+    const confirmed = confirm(
+      "Delete this anime and all its nested episodes? This cannot be undone."
+    );
+
+    if (!confirmed) return;
 
     await remove(ref(db, `anime/${animeId}`));
 
@@ -775,9 +960,9 @@ window.deleteAnime = async (animeId) => {
   }
 };
 
-// ============================================================
-// ANIME DROPDOWN
-// ============================================================
+/* ============================================================
+   14. ANIME DROPDOWN
+   ============================================================ */
 
 async function loadAnimeForDropdown(selectId) {
   requireAuthorizedAdmin();
@@ -789,34 +974,44 @@ async function loadAnimeForDropdown(selectId) {
   select.disabled = true;
   select.replaceChildren();
 
-  const loading = document.createElement("option");
+  const loading = createElement(
+    "option",
+    "",
+    "Loading anime..."
+  );
 
   loading.value = "";
-  loading.textContent = "Loading anime...";
-
   select.appendChild(loading);
 
   try {
     const snapshot = await get(ref(db, "anime"));
 
+    requireAuthorizedAdmin();
+
     select.replaceChildren();
 
-    const placeholder = document.createElement("option");
+    const placeholder = createElement(
+      "option",
+      "",
+      "Select an Anime"
+    );
 
     placeholder.value = "";
-    placeholder.textContent = "Select an Anime";
-
     select.appendChild(placeholder);
 
-    const preSelectedId =
+    const requestedAnimeId =
       new URLSearchParams(location.search).get("id");
 
     const animeItems = [];
 
     snapshot.forEach((child) => {
+      const value = child.val();
+
+      if (!value || typeof value !== "object") return;
+
       animeItems.push({
         id: child.key,
-        ...child.val()
+        ...value
       });
     });
 
@@ -831,14 +1026,23 @@ async function loadAnimeForDropdown(selectId) {
       option.value = anime.id;
       option.textContent = getAnimeTitle(anime);
       option.dataset.title = getAnimeTitle(anime);
-      option.selected = anime.id === preSelectedId;
 
       select.appendChild(option);
     });
 
-    select.disabled = false;
+    select.disabled = animeItems.length === 0;
 
-    if (selectId === "editSelectAnime" && preSelectedId) {
+    if (
+      requestedAnimeId &&
+      animeItems.some((item) => item.id === requestedAnimeId)
+    ) {
+      select.value = requestedAnimeId;
+    }
+
+    if (
+      selectId === "editSelectAnime" &&
+      select.value
+    ) {
       await loadEpisodesForEdit();
     }
   } catch (error) {
@@ -850,57 +1054,65 @@ async function loadAnimeForDropdown(selectId) {
 
     select.replaceChildren();
 
-    const option = document.createElement("option");
+    const option = createElement(
+      "option",
+      "",
+      "Unable to load anime"
+    );
 
     option.value = "";
-    option.textContent = "Unable to load anime";
 
     select.appendChild(option);
   }
 }
 
-// ============================================================
-// UPLOAD EPISODE
-//
-// /anime/{animeId}/episodes/{episodeId}
-//
-// This nested structure is used to match the existing player.
-// ============================================================
+/* ============================================================
+   15. UPLOAD EPISODE
+   Path:
+   anime/{animeId}/episodes/{episodeId}
+   ============================================================ */
 
 $("episodeForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const message = $("episodeMsg");
-  const select = $("selectAnimeForEp");
+  const form = $("episodeForm");
+  const button = form?.querySelector(
+    'button[type="submit"], input[type="submit"]'
+  );
+
+  if (button) button.disabled = true;
 
   try {
     requireAuthorizedAdmin();
 
-    if (!select?.value) {
+    const animeSelect = $("selectAnimeForEp");
+    const animeId = animeSelect?.value || "";
+
+    if (!animeId) {
       throw new Error("Please select an anime.");
     }
 
-    setMessage(message, "Saving episode...", "info");
-
-    const animeId = select.value;
-
     const selectedOption =
-      select.options[select.selectedIndex];
+      animeSelect.options[animeSelect.selectedIndex];
 
-    const selectedTitle =
+    const animeTitle =
       selectedOption?.dataset.title ||
-      selectedOption?.textContent ||
+      selectedOption?.textContent?.trim() ||
       "";
+
+    const season = getNumber("epSeason", 1);
+    const episodeNumber = getNumber("epNumber", 1);
+
+    if (!animeTitle) {
+      throw new Error("Anime title is missing.");
+    }
 
     const media = collectMediaData();
 
     if (!media.videoQualities.length) {
       throw new Error("Add at least one video URL.");
     }
-
-    const episodeRef = push(
-      ref(db, `anime/${animeId}/episodes`)
-    );
 
     const qualities = {};
 
@@ -914,30 +1126,38 @@ $("episodeForm")?.addEventListener("submit", async (event) => {
       subtitles[item.language] = item.src;
     });
 
+    const episodeRef = push(
+      ref(db, `anime/${animeId}/episodes`)
+    );
+
+    const now = Date.now();
+
     const episodeData = {
       animeId,
-      animeTitle: selectedTitle.trim(),
-      season: getNumber("epSeason", 1),
-      episode: getNumber("epNumber", 1),
+      animeTitle,
+      season,
+      episode: episodeNumber,
 
-      // Fields used by the current admin UI.
+      // Admin editing format.
       videoQualities: media.videoQualities,
       audioTracks: media.audioTracks,
       subtitlesList: media.subtitles,
 
-      // Fields for the existing video-player.js.
+      // Player-compatible format.
       qualities,
       subtitles,
 
-      // The primary video URL and default audio URL.
+      // Default playback URLs.
       videoUrl: media.videoQualities[0].src,
       url: media.videoQualities[0].src,
       audioUrl: media.audioTracks[0]?.src || "",
       streamUrl: media.videoQualities[0].src,
 
-      createdAt: Date.now(),
-      updatedAt: Date.now()
+      createdAt: now,
+      updatedAt: now
     };
+
+    setMessage(message, "Saving episode...", "info");
 
     await set(episodeRef, episodeData);
 
@@ -947,20 +1167,30 @@ $("episodeForm")?.addEventListener("submit", async (event) => {
       "success"
     );
 
-    $("episodeForm").reset();
+    // Reset media fields while keeping selected anime.
+    const selectedAnimeId = animeId;
 
-    // Preserve the selected anime after reset.
-    select.value = animeId;
+    form.reset();
+
+    if (animeSelect) {
+      animeSelect.value = selectedAnimeId;
+    }
 
     resetMediaRows();
   } catch (error) {
-    showError(message, error, "Episode upload failed.");
+    showError(
+      message,
+      error,
+      "Episode upload failed."
+    );
+  } finally {
+    if (button) button.disabled = false;
   }
 });
 
-// ============================================================
-// LOAD EPISODES FOR EDIT
-// ============================================================
+/* ============================================================
+   16. LOAD EPISODES FOR EDITING
+   ============================================================ */
 
 async function loadEpisodesForEdit() {
   requireAuthorizedAdmin();
@@ -977,12 +1207,13 @@ async function loadEpisodesForEdit() {
   episodeSelect.disabled = true;
   episodeSelect.replaceChildren();
 
-  const placeholder = document.createElement("option");
+  const placeholder = createElement(
+    "option",
+    "",
+    animeId ? "Loading episodes..." : "Choose Anime First"
+  );
 
   placeholder.value = "";
-  placeholder.textContent = animeId
-    ? "Loading episodes..."
-    : "Choose Anime First";
 
   episodeSelect.appendChild(placeholder);
 
@@ -993,13 +1224,22 @@ async function loadEpisodesForEdit() {
       ref(db, `anime/${animeId}/episodes`)
     );
 
+    requireAuthorizedAdmin();
+
+    // Do not populate a stale result if the user changed anime.
+    if (animeSelect.value !== animeId) return;
+
     const episodes = [];
 
     if (snapshot.exists()) {
       snapshot.forEach((child) => {
+        const value = child.val();
+
+        if (!value || typeof value !== "object") return;
+
         episodes.push({
           id: child.key,
-          ...child.val()
+          ...value
         });
       });
     }
@@ -1014,12 +1254,15 @@ async function loadEpisodesForEdit() {
 
     episodeSelect.replaceChildren();
 
-    const first = document.createElement("option");
+    const first = createElement(
+      "option",
+      "",
+      episodes.length
+        ? "Select Episode"
+        : "No episodes found"
+    );
 
     first.value = "";
-    first.textContent = episodes.length
-      ? "Select Episode"
-      : "No episodes found";
 
     episodeSelect.appendChild(first);
 
@@ -1044,25 +1287,28 @@ async function loadEpisodesForEdit() {
     };
   } catch (error) {
     showError(
-      null,
+      $("editEpMsg"),
       error,
       "Unable to load episodes."
     );
 
     episodeSelect.replaceChildren();
 
-    const option = document.createElement("option");
+    const option = createElement(
+      "option",
+      "",
+      "Unable to load episodes"
+    );
 
     option.value = "";
-    option.textContent = "Unable to load episodes";
 
     episodeSelect.appendChild(option);
   }
 }
 
-// ============================================================
-// POPULATE EDIT FORM
-// ============================================================
+/* ============================================================
+   17. POPULATE EDIT FORM
+   ============================================================ */
 
 function loadEditFormData(episodeId, episodes) {
   const form = $("editEpisodeForm");
@@ -1101,18 +1347,22 @@ function loadEditFormData(episodeId, episodes) {
   $("audioContainer")?.replaceChildren();
   $("subtitleContainer")?.replaceChildren();
 
+  // Video qualities: array first, legacy map second.
   let videoQualities = Array.isArray(episode.videoQualities)
     ? episode.videoQualities
     : [];
 
-  // Support the qualities map used by video-player.js.
-  if (!videoQualities.length && episode.qualities) {
-    videoQualities = Object.entries(episode.qualities).map(
-      ([quality, src]) => ({
-        quality,
-        src
-      })
-    );
+  if (
+    !videoQualities.length &&
+    episode.qualities &&
+    typeof episode.qualities === "object"
+  ) {
+    videoQualities = Object.entries(
+      episode.qualities
+    ).map(([quality, src]) => ({
+      quality,
+      src
+    }));
   }
 
   if (videoQualities.length) {
@@ -1124,11 +1374,15 @@ function loadEditFormData(episodeId, episodes) {
     });
   } else {
     window.addQualityRow(
-      episode.videoUrl || episode.url || episode.streamUrl || "",
+      episode.videoUrl ||
+      episode.url ||
+      episode.streamUrl ||
+      "",
       "1080"
     );
   }
 
+  // Audio tracks.
   const audioTracks = Array.isArray(episode.audioTracks)
     ? episode.audioTracks
     : [];
@@ -1149,17 +1403,22 @@ function loadEditFormData(episodeId, episodes) {
     window.addAudioRow();
   }
 
+  // Subtitles: current list first, legacy map second.
   let subtitleItems = Array.isArray(episode.subtitlesList)
     ? episode.subtitlesList
     : [];
 
-  if (!subtitleItems.length && episode.subtitles) {
-    subtitleItems = Object.entries(episode.subtitles).map(
-      ([language, src]) => ({
-        language,
-        src
-      })
-    );
+  if (
+    !subtitleItems.length &&
+    episode.subtitles &&
+    typeof episode.subtitles === "object"
+  ) {
+    subtitleItems = Object.entries(
+      episode.subtitles
+    ).map(([language, src]) => ({
+      language,
+      src
+    }));
   }
 
   if (subtitleItems.length) {
@@ -1172,32 +1431,43 @@ function loadEditFormData(episodeId, episodes) {
   } else {
     window.addSubtitleRow();
   }
+
+  setMessage($("editEpMsg"), "");
 }
 
-// ============================================================
-// UPDATE EPISODE
-// ============================================================
+/* ============================================================
+   18. UPDATE EPISODE
+   ============================================================ */
 
 $("editEpisodeForm")?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const message = $("editEpMsg");
-  const episodeId = getValue("editEpId");
-  const animeId = getValue("editSelectAnime");
+  const form = $("editEpisodeForm");
+  const button = form?.querySelector(
+    'button[type="submit"], input[type="submit"]'
+  );
+
+  if (button) button.disabled = true;
 
   try {
     requireAuthorizedAdmin();
 
-    if (!animeId || !episodeId) {
-      throw new Error("Select an anime and episode first.");
-    }
+    const episodeId = getValue("editEpId");
+    const animeId = getValue("editSelectAnime");
 
-    setMessage(message, "Updating episode...", "info");
+    if (!animeId || !episodeId) {
+      throw new Error(
+        "Select an anime and episode first."
+      );
+    }
 
     const media = collectMediaData();
 
     if (!media.videoQualities.length) {
-      throw new Error("At least one video URL is required.");
+      throw new Error(
+        "At least one video URL is required."
+      );
     }
 
     const qualities = {};
@@ -1212,12 +1482,34 @@ $("editEpisodeForm")?.addEventListener("submit", async (event) => {
       subtitles[item.language] = item.src;
     });
 
+    const selectedAnime =
+      $("editSelectAnime")?.selectedOptions?.[0];
+
+    const animeTitle =
+      selectedAnime?.dataset.title ||
+      selectedAnime?.textContent?.trim() ||
+      "";
+
     const episodeRef = ref(
       db,
       `anime/${animeId}/episodes/${episodeId}`
     );
 
+    const currentSnapshot = await get(episodeRef);
+
+    requireAuthorizedAdmin();
+
+    if (!currentSnapshot.exists()) {
+      throw new Error(
+        "This episode no longer exists. Reload the episode list."
+      );
+    }
+
+    const currentEpisode = currentSnapshot.val() || {};
+
     await update(episodeRef, {
+      animeId,
+      animeTitle,
       season: getNumber("editEpSeason", 1),
       episode: getNumber("editEpNumber", 1),
 
@@ -1233,6 +1525,7 @@ $("editEpisodeForm")?.addEventListener("submit", async (event) => {
       audioUrl: media.audioTracks[0]?.src || "",
       streamUrl: media.videoQualities[0].src,
 
+      createdAt: currentEpisode.createdAt || Date.now(),
       updatedAt: Date.now()
     });
 
@@ -1242,15 +1535,19 @@ $("editEpisodeForm")?.addEventListener("submit", async (event) => {
       "success"
     );
   } catch (error) {
-    showError(message, error, "Episode update failed.");
+    showError(
+      message,
+      error,
+      "Episode update failed."
+    );
+  } finally {
+    if (button) button.disabled = false;
   }
 });
 
-// ============================================================
-// DELETE EPISODE
-// Optional: call window.deleteEpisode(episodeId)
-// from an existing button if needed.
-// ============================================================
+/* ============================================================
+   19. DELETE EPISODE
+   ============================================================ */
 
 window.deleteEpisode = async (episodeId) => {
   const animeId = getValue("editSelectAnime");
@@ -1259,7 +1556,9 @@ window.deleteEpisode = async (episodeId) => {
     requireAuthorizedAdmin();
 
     if (!animeId || !episodeId) {
-      throw new Error("Select an anime and episode.");
+      throw new Error(
+        "Select an anime and episode first."
+      );
     }
 
     if (!confirm("Delete this episode permanently?")) {
@@ -1267,7 +1566,10 @@ window.deleteEpisode = async (episodeId) => {
     }
 
     await remove(
-      ref(db, `anime/${animeId}/episodes/${episodeId}`)
+      ref(
+        db,
+        `anime/${animeId}/episodes/${episodeId}`
+      )
     );
 
     setMessage(
@@ -1286,9 +1588,9 @@ window.deleteEpisode = async (episodeId) => {
   }
 };
 
-// ============================================================
-// INITIAL MEDIA ROWS
-// ============================================================
+/* ============================================================
+   20. INITIAL MEDIA ROWS
+   ============================================================ */
 
 if ($("qualityContainer")?.children.length === 0) {
   window.addQualityRow();
@@ -1301,3 +1603,7 @@ if ($("audioContainer")?.children.length === 0) {
 if ($("subtitleContainer")?.children.length === 0) {
   window.addSubtitleRow();
 }
+
+/* ============================================================
+   END OF admin.js
+   ============================================================ */
