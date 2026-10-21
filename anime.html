@@ -2,114 +2,923 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Anime — Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Add Anime — Anime Max Zone Admin</title>
+    <meta name="description" content="Add and manage anime and movies in Anime Max Zone.">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#080812">
+
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="admin.css">
+
+    <style>
+        :root {
+            color-scheme: dark;
+            --page-bg: #080812;
+            --card-bg: #111120;
+            --input-bg: #0b0b17;
+            --border: rgba(255,255,255,.10);
+            --text: #f4f2ff;
+            --muted: #a6a3bd;
+            --purple: #8b5cf6;
+            --pink: #ec4899;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--page-bg);
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            background:
+                radial-gradient(
+                    ellipse at 10% 0%,
+                    rgba(139,92,246,.13),
+                    transparent 42%
+                ),
+                radial-gradient(
+                    ellipse at 100% 30%,
+                    rgba(236,72,153,.07),
+                    transparent 38%
+                ),
+                var(--page-bg);
+            color: var(--text);
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+                         "Segoe UI", sans-serif;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        .admin-header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            min-height: 68px;
+            padding: 14px 5%;
+            background: rgba(8,8,18,.88);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+        }
+
+        .logo {
+            color: #fff;
+            font-size: 17px;
+            font-weight: 850;
+            letter-spacing: 1.5px;
+        }
+
+        .logo span {
+            color: #b69aff;
+        }
+
+        .btn-logout-top {
+            padding: 10px 17px;
+            border: 1px solid rgba(236,72,153,.35);
+            border-radius: 12px;
+            background: rgba(236,72,153,.10);
+            color: #ff9bce;
+            font-size: 13px;
+            font-weight: 750;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .btn-logout-top:hover {
+            background: rgba(236,72,153,.2);
+            border-color: var(--pink);
+        }
+
+        .main-content {
+            width: min(100% - 32px, 620px);
+            margin: 0 auto;
+            padding: 32px 0 28px;
+        }
+
+        .page-heading {
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            color: #bba5ff;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--pink);
+            box-shadow: 0 0 12px rgba(236,72,153,.8);
+            content: "";
+        }
+
+        .page-title {
+            margin: 0 0 9px;
+            color: var(--text);
+            font-size: clamp(25px, 5vw, 33px);
+            font-weight: 850;
+            line-height: 1.2;
+            letter-spacing: -.8px;
+        }
+
+        .page-description {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .form-card {
+            padding: clamp(18px, 4vw, 28px);
+            overflow: hidden;
+            border: 1px solid rgba(167,139,250,.18);
+            border-radius: 22px;
+            background: linear-gradient(
+                145deg,
+                rgba(20,20,39,.98),
+                rgba(13,13,25,.98)
+            );
+            box-shadow: 0 18px 50px rgba(0,0,0,.22);
+        }
+
+        .form-card-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 19px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .heading-icon {
+            display: grid;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            place-items: center;
+            border: 1px solid rgba(167,139,250,.25);
+            border-radius: 14px;
+            background: rgba(139,92,246,.14);
+            color: #c4b5fd;
+        }
+
+        .heading-icon svg {
+            width: 23px;
+            height: 23px;
+        }
+
+        .form-card-heading h3 {
+            margin: 0 0 5px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .form-card-heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .input-group {
+            margin-bottom: 21px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #e9e5ff;
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .required-mark {
+            color: #fb75b7;
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            display: block;
+            width: 100%;
+            min-height: 49px;
+            padding: 13px 14px;
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 12px;
+            outline: none;
+            background: var(--input-bg);
+            color: #fff;
+            font-size: 14px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .input-group input::placeholder,
+        .input-group textarea::placeholder {
+            color: #77748f;
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(139,92,246,.13);
+        }
+
+        .input-hint {
+            display: block;
+            margin-top: 8px;
+            color: #8f8ba8;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .type-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .type-option {
+            position: relative;
+        }
+
+        .type-option input {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .type-option label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            min-height: 49px;
+            margin: 0;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--input-bg);
+            color: #aaa6c3;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .type-option label svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .type-option input:checked + label {
+            border-color: rgba(167,139,250,.8);
+            background: rgba(139,92,246,.14);
+            color: #d9ccff;
+            box-shadow: inset 0 0 0 1px rgba(139,92,246,.12);
+        }
+
+        .type-option input:focus-visible + label {
+            outline: 2px solid var(--purple);
+            outline-offset: 3px;
+        }
+
+        #seasonsGroup {
+            transition: opacity .2s ease;
+        }
+
+        #seasonsGroup[hidden] {
+            display: none !important;
+        }
+
+        .poster-preview {
+            display: none;
+            align-items: flex-start;
+            gap: 13px;
+            margin-top: 12px;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: rgba(255,255,255,.025);
+        }
+
+        .poster-preview.visible {
+            display: flex;
+        }
+
+        .poster-preview img {
+            width: 66px;
+            height: 88px;
+            flex-shrink: 0;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #1a1a2b;
+        }
+
+        .poster-preview-text {
+            min-width: 0;
+            padding-top: 5px;
+        }
+
+        .poster-preview-text strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .poster-preview-text span {
+            display: block;
+            overflow-wrap: anywhere;
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            min-height: 52px;
+            padding: 14px 18px;
+            border: 0;
+            border-radius: 13px;
+            background: linear-gradient(110deg, #7c3aed, #a855f7 55%, #ec4899);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 850;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(139,92,246,.2);
+            transition: transform .2s ease, opacity .2s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 30px rgba(139,92,246,.28);
+        }
+
+        .btn-primary:disabled {
+            opacity: .65;
+            cursor: wait;
+            transform: none;
+        }
+
+        .btn-primary svg {
+            width: 19px;
+            height: 19px;
+        }
+
+        .success-msg {
+            display: none;
+            margin: 15px 0 0;
+            padding: 12px 14px;
+            border: 1px solid rgba(52,211,153,.22);
+            border-radius: 11px;
+            background: rgba(16,185,129,.08);
+            color: #6ee7b7;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .success-msg:not(:empty) {
+            display: block;
+        }
+
+        .success-msg.error {
+            border-color: rgba(251,113,133,.25);
+            background: rgba(244,63,94,.08);
+            color: #fda4af;
+        }
+
+        .security-note {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 18px;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            background: rgba(255,255,255,.025);
+            color: #a5a1bd;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .security-note svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            color: #a78bfa;
+        }
+
+        .admin-bottom-nav {
+            position: fixed;
+            z-index: 60;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            padding: 9px 8px calc(9px + env(safe-area-inset-bottom));
+            border-top: 1px solid rgba(255,255,255,.1);
+            background: rgba(10,10,21,.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-height: 54px;
+            padding: 5px 2px;
+            border-radius: 12px;
+            color: #85819f;
+            font-size: 10px;
+            font-weight: 700;
+            text-align: center;
+            text-decoration: none;
+            transition: .2s ease;
+        }
+
+        .nav-item svg {
+            width: 21px;
+            height: 21px;
+        }
+
+        .nav-item.active {
+            background: rgba(139,92,246,.12);
+            color: #c4b5fd;
+        }
+
+        .nav-item:active {
+            transform: scale(.96);
+        }
+
+        @media (min-width: 700px) {
+            .main-content {
+                padding-top: 45px;
+            }
+
+            .admin-bottom-nav {
+                right: auto;
+                left: 50%;
+                bottom: 18px;
+                width: min(560px, calc(100% - 32px));
+                padding: 10px;
+                border: 1px solid var(--border);
+                border-radius: 18px;
+                transform: translateX(-50%);
+                box-shadow: 0 15px 50px rgba(0,0,0,.4);
+            }
+
+            body {
+                padding-bottom: 120px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+                animation-duration: .01ms !important;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-    <!-- ================= TOP HEADER ================= -->
+    <!-- Admin Header -->
     <header class="admin-header">
-        <div class="logo">ADMIN PANEL</div>
-        <button id="logoutBtn" class="btn-logout-top">Logout</button>
+        <div class="logo">ANIME <span>MAX</span> ZONE</div>
+
+        <button
+            id="logoutBtn"
+            class="btn-logout-top"
+            type="button"
+            aria-label="Logout from admin panel"
+        >
+            Logout
+        </button>
     </header>
 
-    <!-- ================= MAIN CONTENT ================= -->
+    <!-- Main Content -->
     <main class="main-content">
-        
-        <h2 class="page-title">Add New Anime / Movie</h2>
-        
-        <form id="animeForm">
-            <div class="input-group">
-                <label>Title</label>
-                <input type="text" id="animeTitle" required placeholder="e.g. Naruto">
+
+        <section class="page-heading">
+            <div class="eyebrow">Content Management</div>
+
+            <h1 class="page-title">Add New Anime / Movie</h1>
+
+            <p class="page-description">
+                Add anime series or movies to your catalog and make them
+                available on Anime Max Zone.
+            </p>
+        </section>
+
+        <section class="form-card">
+
+            <div class="form-card-heading">
+                <div class="heading-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 5v14m7-7H5"/>
+                    </svg>
+                </div>
+
+                <div>
+                    <h3>Anime Details</h3>
+                    <p>Enter the information below.</p>
+                </div>
             </div>
-            
-            <div class="input-group">
-                <label>Type</label>
-                <select id="animeType">
-                    <option value="series">Series</option>
-                    <option value="movie">Movie</option>
-                </select>
-            </div>
-            
-            <div class="input-group">
-                <label>Poster Image URL</label>
-                <input type="url" id="animePoster" required placeholder="https://...">
-            </div>
-            
-            <div class="input-group">
-                <label>Genres (Comma separated)</label>
-                <input type="text" id="animeGenres" required placeholder="Action, Fantasy">
-            </div>
-            
-            <!-- Agar Movie select karte hain toh isko JS se hide kar denge -->
-            <div class="input-group" id="seasonsGroup">
-                <label>Total Seasons (For Series)</label>
-                <input type="number" id="animeSeasons" value="1" min="1">
-            </div>
-            
-            <div class="input-group">
-                <label>Description</label>
-                <textarea id="animeDesc" rows="4" required placeholder="Write a brief synopsis..."></textarea>
-            </div>
-            
-            <button type="submit" class="btn-primary">Save Anime</button>
-            <p id="animeMsg" class="success-msg"></p>
-        </form>
-        
+
+            <form id="animeForm">
+
+                <!-- Anime Title -->
+                <div class="input-group">
+                    <label for="animeTitle">
+                        Title <span class="required-mark">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="animeTitle"
+                        name="title"
+                        required
+                        maxlength="150"
+                        autocomplete="off"
+                        placeholder="e.g. Naruto Shippuden"
+                    >
+                </div>
+
+                <!-- Content Type -->
+                <div class="input-group">
+                    <label>Content Type <span class="required-mark">*</span></label>
+
+                    <div class="type-options">
+
+                        <div class="type-option">
+                            <input
+                                type="radio"
+                                id="typeSeries"
+                                name="contentType"
+                                value="series"
+                                checked
+                            >
+
+                            <label for="typeSeries">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="1.8">
+                                    <rect width="16" height="16" x="4" y="4"
+                                          rx="2"/>
+                                    <path stroke-linecap="round"
+                                          d="M8 4v16M16 4v16M4 9h4m-4 6h4m8-6h4m-4 6h4"/>
+                                </svg>
+                                Series
+                            </label>
+                        </div>
+
+                        <div class="type-option">
+                            <input
+                                type="radio"
+                                id="typeMovie"
+                                name="contentType"
+                                value="movie"
+                            >
+
+                            <label for="typeMovie">
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none" viewBox="0 0 24 24"
+                                     stroke="currentColor" stroke-width="1.8">
+                                    <rect width="18" height="14" x="3" y="5"
+                                          rx="2"/>
+                                    <path stroke-linecap="round"
+                                          stroke-linejoin="round"
+                                          d="m10 9 5 3-5 3V9Z"/>
+                                </svg>
+                                Movie
+                            </label>
+                        </div>
+
+                    </div>
+
+                    <!-- Required by existing admin.js -->
+                    <select id="animeType" name="type" hidden aria-hidden="true">
+                        <option value="series" selected>Series</option>
+                        <option value="movie">Movie</option>
+                    </select>
+                </div>
+
+                <!-- Poster Image -->
+                <div class="input-group">
+                    <label for="animePoster">
+                        Poster Image URL <span class="required-mark">*</span>
+                    </label>
+
+                    <input
+                        type="url"
+                        id="animePoster"
+                        name="posterImageUrl"
+                        required
+                        inputmode="url"
+                        autocomplete="url"
+                        placeholder="https://example.com/poster.jpg"
+                    >
+
+                    <span class="input-hint">
+                        Paste a publicly accessible image URL. Use a direct
+                        image link when possible.
+                    </span>
+
+                    <div class="poster-preview" id="posterPreview">
+                        <img id="posterPreviewImage" src="" alt="Poster preview">
+
+                        <div class="poster-preview-text">
+                            <strong>Poster Preview</strong>
+                            <span id="posterPreviewStatus">
+                                Preview of your selected poster.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Genres -->
+                <div class="input-group">
+                    <label for="animeGenres">
+                        Genres <span class="required-mark">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="animeGenres"
+                        name="genres"
+                        required
+                        maxlength="250"
+                        placeholder="Action, Adventure, Fantasy"
+                    >
+
+                    <span class="input-hint">
+                        Separate multiple genres with commas.
+                    </span>
+                </div>
+
+                <!-- Total Seasons -->
+                <div class="input-group" id="seasonsGroup">
+                    <label for="animeSeasons">
+                        Total Seasons <span class="required-mark">*</span>
+                    </label>
+
+                    <input
+                        type="number"
+                        id="animeSeasons"
+                        name="totalSeasons"
+                        value="1"
+                        min="1"
+                        max="100"
+                        step="1"
+                        required
+                    >
+
+                    <span class="input-hint">
+                        Select the number of seasons for this series.
+                    </span>
+                </div>
+
+                <!-- Description -->
+                <div class="input-group">
+                    <label for="animeDesc">
+                        Description <span class="required-mark">*</span>
+                    </label>
+
+                    <textarea
+                        id="animeDesc"
+                        name="description"
+                        rows="5"
+                        required
+                        maxlength="5000"
+                        placeholder="Write a brief synopsis of this anime or movie..."
+                    ></textarea>
+
+                    <span class="input-hint">
+                        Add a short summary to help viewers understand the story.
+                    </span>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn-primary" id="saveAnimeBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         fill="none" viewBox="0 0 24 24"
+                         stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="m5 12 4 4L19 6"/>
+                    </svg>
+
+                    <span>Save Anime</span>
+                </button>
+
+                <!-- Required by existing admin.js -->
+                <p
+                    id="animeMsg"
+                    class="success-msg"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+        </section>
+
+        <div class="security-note">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1.8"
+                 aria-hidden="true">
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 3 4.5 6v5.5c0 4.7 3.2 7.7 7.5 9.5 4.3-1.8 7.5-4.8 7.5-9.5V6L12 3Z"/>
+                <path stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="m9 12 2 2 4-4"/>
+            </svg>
+
+            <span>
+                Anime data is saved through the configured Firebase
+                Realtime Database. Only accounts authorized by your
+                database security rules should be allowed to add or edit
+                content.
+            </span>
+        </div>
+
     </main>
 
-    <!-- ================= BOTTOM NAVIGATION BAR ================= -->
-    <nav class="admin-bottom-nav">
-        <!-- Anime List -->
+    <!-- Bottom Navigation -->
+    <nav class="admin-bottom-nav" aria-label="Admin navigation">
+
         <a href="anime-list.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
             </svg>
             <span>List</span>
         </a>
-        
-        <!-- Add Anime (Active) -->
-        <a href="anime.html" class="nav-item active">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+
+        <a href="anime.html" class="nav-item active" aria-current="page">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 4v16m8-8H4"/>
             </svg>
             <span>Add Anime</span>
         </a>
 
-        <!-- Upload Episode -->
         <a href="upload.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8-4-4m0 0L8 8m4-4v12"/>
             </svg>
             <span>Upload</span>
         </a>
 
-        <!-- Edit Episode -->
         <a href="edit.html" class="nav-item">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 24 24"
+                 stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5m-1.4-9.4a2 2 0 0 1 2.8 2.8L11.8 15H9v-2.8l8.6-8.6Z"/>
             </svg>
             <span>Edit</span>
         </a>
+
     </nav>
 
-    <!-- Admin Script -->
+    <!-- Keep the existing Firebase admin logic -->
     <script type="module" src="admin.js"></script>
 
-    <!-- Bonus Smart UX Feature: Hide Seasons for Movies -->
+    <!-- Form UI behavior -->
     <script>
-        document.getElementById('animeType').addEventListener('change', function() {
-            const seasonsGroup = document.getElementById('seasonsGroup');
-            if (this.value === 'movie') {
-                seasonsGroup.style.display = 'none';
-                document.getElementById('animeSeasons').value = 1;
-            } else {
-                seasonsGroup.style.display = 'block';
+        (() => {
+            const typeSelect = document.getElementById("animeType");
+            const seriesRadio = document.getElementById("typeSeries");
+            const movieRadio = document.getElementById("typeMovie");
+            const seasonsGroup = document.getElementById("seasonsGroup");
+            const seasonsInput = document.getElementById("animeSeasons");
+
+            const posterInput = document.getElementById("animePoster");
+            const posterPreview = document.getElementById("posterPreview");
+            const posterPreviewImage =
+                document.getElementById("posterPreviewImage");
+            const posterPreviewStatus =
+                document.getElementById("posterPreviewStatus");
+
+            function updateContentType() {
+                const type = movieRadio.checked ? "movie" : "series";
+
+                // Keep animeType in sync for the existing admin.js.
+                typeSelect.value = type;
+
+                const isMovie = type === "movie";
+
+                seasonsGroup.hidden = isMovie;
+                seasonsInput.required = !isMovie;
+
+                if (isMovie) {
+                    seasonsInput.value = "1";
+                }
             }
-        });
+
+            seriesRadio.addEventListener("change", updateContentType);
+            movieRadio.addEventListener("change", updateContentType);
+
+            // Poster preview; this does not upload the image.
+            posterInput.addEventListener("input", () => {
+                const url = posterInput.value.trim();
+
+                posterPreview.classList.remove("visible");
+                posterPreviewImage.removeAttribute("src");
+
+                if (!url) {
+                    return;
+                }
+
+                try {
+                    const parsed = new URL(url);
+
+                    if (parsed.protocol !== "https:" &&
+                        parsed.protocol !== "http:") {
+                        return;
+                    }
+
+                    posterPreviewStatus.textContent = "Loading preview...";
+                    posterPreview.classList.add("visible");
+                    posterPreviewImage.src = parsed.href;
+                } catch {
+                    return;
+                }
+            });
+
+            posterPreviewImage.addEventListener("load", () => {
+                posterPreviewStatus.textContent =
+                    "Image preview loaded successfully.";
+            });
+
+            posterPreviewImage.addEventListener("error", () => {
+                posterPreviewStatus.textContent =
+                    "Preview unavailable. Check the image URL.";
+                posterPreviewImage.removeAttribute("src");
+            });
+
+            // Keep the existing admin.js submission handler in control.
+            // Do not add another submit handler that writes duplicate records.
+            updateContentType();
+        })();
     </script>
+
 </body>
 </html>
