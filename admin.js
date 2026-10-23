@@ -17,12 +17,12 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.database();
 
-let globalContentData = {}; // Data store for Upload & Dashboard pages
+let globalContentData = {}; 
 
 // ================= 2. GLOBAL AUTHENTICATION & PAGE PROTECTION =================
 document.addEventListener('DOMContentLoaded', () => {
     
-    // Logout Button Logic (Header me har page par hai)
+    // Logout Button
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -32,16 +32,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auth State Check (Page Protection)
+    // Auth State Check
     auth.onAuthStateChanged((user) => {
         const path = window.location.href;
-        
-        // Agar login page par hain aur user logged in hai, toh dashboard bhejo
         if (user && path.includes('admin-login.html')) {
             window.location.href = 'admin-dashboard.html';
         }
-        
-        // Agar kisi admin page par hain aur logged in nahi hai, toh login bhejo
         if (!user && !path.includes('admin-login.html')) {
             window.location.href = 'admin-login.html';
         }
@@ -53,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
 
-    // Email/Password Login
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -70,9 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginError.style.color = "#a855f7";
 
             auth.signInWithEmailAndPassword(email, password)
-                .then(() => {
-                    window.location.href = 'admin-dashboard.html'; 
-                })
+                .then(() => { window.location.href = 'admin-dashboard.html'; })
                 .catch((error) => {
                     loginError.innerText = "Invalid Email or Password!";
                     loginError.style.color = "#ff4d4d";
@@ -80,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Google Login
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -88,9 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loginError.innerText = "Opening Google...";
             
             auth.signInWithPopup(provider)
-                .then(() => {
-                    window.location.href = 'admin-dashboard.html';
-                })
+                .then(() => { window.location.href = 'admin-dashboard.html'; })
                 .catch((error) => {
                     if (error.code === 'auth/popup-blocked') {
                         auth.signInWithRedirect(provider);
@@ -102,7 +92,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Check Google Redirect Result
     auth.getRedirectResult().then((result) => {
         if (result.user && window.location.href.includes('admin-login.html')) {
             window.location.href = 'admin-dashboard.html'; 
@@ -115,12 +104,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const movieListContainer = document.getElementById('movieListContainer');
 
     if (animeListContainer && movieListContainer) {
-        // Real-time data fetch for Dashboard
         db.ref('content').on('value', (snapshot) => {
             globalContentData = snapshot.val() || {};
             animeListContainer.innerHTML = '';
             movieListContainer.innerHTML = '';
             let hasAnime = false, hasMovies = false;
+            let animeCount = 0, movieCount = 0;
 
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
@@ -134,9 +123,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="edit-btn" onclick="window.location.href='admin-edit.html?id=${key}'"><i class="fa-solid fa-pen"></i> Edit</button>
                     </div>
                 `;
-                if (item.type === 'movie') { movieListContainer.innerHTML += listHTML; hasMovies = true; }
-                else { animeListContainer.innerHTML += listHTML; hasAnime = true; }
+                if (item.type === 'movie') { 
+                    movieListContainer.innerHTML += listHTML; 
+                    hasMovies = true; 
+                    movieCount++;
+                } else { 
+                    animeListContainer.innerHTML += listHTML; 
+                    hasAnime = true; 
+                    animeCount++;
+                }
             });
+
+            if(document.getElementById('animeCount')) document.getElementById('animeCount').innerText = `${animeCount} Items`;
+            if(document.getElementById('movieCount')) document.getElementById('movieCount').innerText = `${movieCount} Items`;
 
             if(!hasAnime) animeListContainer.innerHTML = '<p class="loading-text">No Anime added yet.</p>';
             if(!hasMovies) movieListContainer.innerHTML = '<p class="loading-text">No Movies added yet.</p>';
@@ -162,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 year: document.getElementById('addYear').value.trim() || new Date().getFullYear().toString(),
                 genres: document.getElementById('addGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('addSynopsis').value.trim(),
-                seasons: {}, // Empty init
-                gdrive_id: "" // Empty init
+                seasons: {},
+                gdrive_id: ""
             };
 
             db.ref('content').push(newData).then(() => {
@@ -177,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 6. UPLOAD PAGE LOGIC =================
+    // ================= 6. UPLOAD PAGE LOGIC (Updated for Audio, Quality, Subtitle) =================
     const uploadTitleSelect = document.getElementById('uploadTitleSelect');
     if (uploadTitleSelect) {
         // Populate Dropdown
@@ -190,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Change Event to Show/Hide Fields
+        // Show/Hide Fields
         uploadTitleSelect.addEventListener('change', (e) => {
             const selectedKey = e.target.value;
             const movieFields = document.getElementById('uploadMovieFields');
@@ -206,13 +205,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (item.type === 'movie') {
                 movieFields.style.display = 'block'; animeFields.style.display = 'none';
-                document.getElementById('movieVideoId').value = item.gdrive_id || '';
+                // Optional: Pre-fill if existing data
+                if(item.qualities) {
+                    document.getElementById('movieVideo480').value = item.qualities['480p'] || '';
+                    document.getElementById('movieVideo720').value = item.qualities['720p'] || '';
+                    document.getElementById('movieVideo1080').value = item.qualities['1080p'] || '';
+                }
+                document.getElementById('movieAudio').value = item.audio || 'Hindi';
+                document.getElementById('movieSubtitle').value = item.subtitle || '';
             } else {
                 movieFields.style.display = 'none'; animeFields.style.display = 'block';
             }
         });
 
-        // Submit Upload
+        // Submit Upload Form
         document.getElementById('uploadForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const selectedKey = uploadTitleSelect.value;
@@ -221,22 +227,44 @@ document.addEventListener('DOMContentLoaded', () => {
             status.innerText = "Uploading..."; status.style.color = "#a855f7";
 
             if(item.type === 'movie') {
-                db.ref('content/' + selectedKey + '/gdrive_id').set(document.getElementById('movieVideoId').value.trim())
-                    .then(() => { 
-                        status.innerText = "Movie Video Updated!"; 
-                        status.style.color = "#22c55e";
-                        setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
-                    });
+                const qualities = {
+                    "480p": document.getElementById('movieVideo480').value.trim(),
+                    "720p": document.getElementById('movieVideo720').value.trim(),
+                    "1080p": document.getElementById('movieVideo1080').value.trim()
+                };
+                const audioLang = document.getElementById('movieAudio').value.trim() || "Hindi";
+                const subtitleUrl = document.getElementById('movieSubtitle').value.trim();
+
+                db.ref('content/' + selectedKey).update({
+                    qualities: qualities,
+                    audio: audioLang,
+                    subtitle: subtitleUrl
+                }).then(() => { 
+                    status.innerText = "Movie Updated Successfully!"; 
+                    status.style.color = "#22c55e";
+                    setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
+                });
             } else {
                 const seasonName = document.getElementById('uploadSeasonName').value.trim() || "Season 1";
                 const epNo = document.getElementById('newEpNumber').value;
                 const epTitle = document.getElementById('newEpTitle').value.trim();
-                const epVideoId = document.getElementById('newEpVideoId').value.trim();
-
-                if(!epNo || !epTitle || !epVideoId) {
-                    status.innerText = "Please fill all episode fields!"; status.style.color = "#ff4d4d"; return;
+                const audioLang = document.getElementById('animeAudio').value.trim() || "Hindi";
+                
+                if(!epNo || !epTitle) {
+                    status.innerText = "Please fill Episode No and Title!"; status.style.color = "#ff4d4d"; return;
                 }
-                const newEp = { ep: parseInt(epNo), title: epTitle, gdrive_id: epVideoId };
+
+                const newEp = { 
+                    ep: parseInt(epNo), 
+                    title: epTitle,
+                    audio: audioLang,
+                    qualities: {
+                        "480p": document.getElementById('newEpVideo480').value.trim(),
+                        "720p": document.getElementById('newEpVideo720').value.trim(),
+                        "1080p": document.getElementById('newEpVideo1080').value.trim()
+                    },
+                    subtitle: document.getElementById('animeSubtitle').value.trim()
+                };
 
                 db.ref(`content/${selectedKey}/seasons/${seasonName}`).push(newEp).then(() => {
                     status.innerText = `Episode Added Successfully!`;
@@ -256,15 +284,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
 
-        // Fetch Data for specific item
+        // Fetch Data
         db.ref('content/' + editId).once('value').then(snapshot => {
             const data = snapshot.val();
             if(data) {
                 document.getElementById('editId').value = editId;
                 document.getElementById('editTitle').value = data.title || '';
+                document.getElementById('editType').value = data.type === 'movie' ? 'Movie' : 'Anime Series';
                 document.getElementById('editImage').value = data.image || '';
+                document.getElementById('editBanner').value = data.banner || '';
                 document.getElementById('editRating').value = data.rating || '';
                 document.getElementById('editYear').value = data.year || '';
+                document.getElementById('editGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editSynopsis').value = data.synopsis || '';
             }
         });
@@ -279,8 +310,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const updatedData = {
                 title: document.getElementById('editTitle').value.trim(),
                 image: document.getElementById('editImage').value.trim(),
+                banner: document.getElementById('editBanner').value.trim(),
                 rating: parseFloat(document.getElementById('editRating').value) || 0,
                 year: document.getElementById('editYear').value.trim(),
+                genres: document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('editSynopsis').value.trim()
             };
 
@@ -292,5 +325,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; 
             });
         });
+
+        // Delete Button Logic
+        const deleteBtn = document.getElementById('deleteBtn');
+        if(deleteBtn) {
+            deleteBtn.addEventListener('click', () => {
+                const id = document.getElementById('editId').value;
+                if(confirm("Are you sure you want to delete this title? This action cannot be undone!")) {
+                    db.ref('content/' + id).remove().then(() => {
+                        alert("Content Deleted Successfully!");
+                        window.location.href = 'admin-dashboard.html';
+                    }).catch(err => alert("Error deleting: " + err.message));
+                }
+            });
+        }
     }
 });
