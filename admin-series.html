@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Series Details - Admin</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body class="admin-body dashboard-body">
+
+    <!-- Header Section -->
+    <header class="admin-header">
+        <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none; padding: 8px 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
+        <div class="logo-text"><h1>Series Details</h1></div>
+        <div style="width: 70px;"></div> <!-- Flexbox balance ke liye -->
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+        
+        <!-- Series Info Card (Yahan Series ki basic details dikhengi) -->
+        <div id="seriesInfoCard" class="form-container" style="margin-bottom: 20px; text-align: center; display: none;">
+            <img id="seriesImage" src="" style="width: 120px; height: 170px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+            <h2 id="seriesTitle" style="color: #fff; margin-bottom: 5px;">Loading...</h2>
+            <p id="seriesYear" style="color: #888; font-size: 13px; margin-bottom: 15px;">----</p>
+            
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <!-- Edit Series Button (Basic Info edit karne ke liye) -->
+                <button id="editSeriesBtn" class="admin-btn" style="margin-top: 0; width: auto; padding: 10px 20px; font-size: 13px;">
+                    <i class="fa-solid fa-pen"></i> Edit Series
+                </button>
+                <!-- Add Episodes Button (Direct Upload page par bhejega) -->
+                <button id="uploadEpBtn" class="admin-btn" style="margin-top: 0; width: auto; padding: 10px 20px; font-size: 13px; background: #22c55e;">
+                    <i class="fa-solid fa-upload"></i> Add Episodes
+                </button>
+            </div>
+        </div>
+
+        <!-- Episodes List Section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="color: #a855f7; font-size: 16px; margin: 0;">Episodes List</h3>
+            <span id="epCountBadge" style="font-size: 12px; color: #888;"></span>
+        </div>
+        
+        <!-- Yahan JS se Episodes load honge -->
+        <div id="episodesListContainer" class="admin-list">
+            <p class="loading-text">Loading Episodes...</p>
+        </div>
+        
+    </main>
+
+    <!-- Admin JS File -->
+    <script src="admin.js"></script>
+</body>
+</html>
