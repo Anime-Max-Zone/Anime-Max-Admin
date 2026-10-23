@@ -101,10 +101,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
+                
+                // 🔥 FIX: Anime click par Series Page khulega, Movie click par Edit Page
+                const targetUrl = item.type === 'movie' ? `admin-edit.html?id=${key}` : `admin-series.html?id=${key}`;
+                
                 const listHTML = `
                     <div class="list-item">
-                        <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75'">
-                        <div class="list-item-info">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75'" onclick="window.location.href='${targetUrl}'" style="cursor:pointer;">
+                        <div class="list-item-info" style="cursor: pointer;" onclick="window.location.href='${targetUrl}'">
                             <h4>${item.title}</h4>
                             <p>${item.type === 'movie' ? 'Movie' : 'Anime'} | ${item.year || 'N/A'}</p>
                         </div>
@@ -132,6 +136,70 @@ document.addEventListener('DOMContentLoaded', () => {
             db.ref('content/' + id).remove().then(() => {
                 alert("Deleted Successfully!");
             }).catch(err => alert("Error: " + err.message));
+        }
+    };
+
+
+    // ================= 4.5 SERIES DETAILS PAGE LOGIC =================
+    const seriesInfoCard = document.getElementById('seriesInfoCard');
+    if (seriesInfoCard) {
+        const seriesId = new URLSearchParams(window.location.search).get('id');
+        if (!seriesId) { window.location.href = 'admin-dashboard.html'; }
+
+        // Edit aur Add Episode Buttons
+        document.getElementById('editSeriesBtn').onclick = () => window.location.href = `admin-edit.html?id=${seriesId}`;
+        document.getElementById('uploadEpBtn').onclick = () => window.location.href = `admin-upload.html?series_id=${seriesId}`;
+
+        // Series Data aur Episodes List Load karein
+        db.ref('content/' + seriesId).on('value', snapshot => {
+            const data = snapshot.val();
+            if(data) {
+                seriesInfoCard.style.display = 'block';
+                document.getElementById('seriesImage').src = data.image;
+                document.getElementById('seriesTitle').innerText = data.title;
+                document.getElementById('seriesYear').innerText = data.year;
+
+                const epContainer = document.getElementById('episodesListContainer');
+                epContainer.innerHTML = '';
+                
+                if(data.seasons) {
+                    Object.keys(data.seasons).forEach(seasonName => {
+                        // Season Header
+                        epContainer.innerHTML += `<h4 style="color: #a855f7; margin: 15px 0 10px 0;">${seasonName}</h4>`;
+                        
+                        const episodes = data.seasons[seasonName];
+                        const epArray = Object.keys(episodes).map(k => ({ firebaseKey: k, ...episodes[k] }));
+
+                        epArray.forEach(ep => {
+                            epContainer.innerHTML += `
+                                <div class="list-item" style="padding: 10px 15px;">
+                                    <div class="list-item-info">
+                                        <h4 style="font-size: 14px;">Ep ${ep.ep}: ${ep.title}</h4>
+                                        <p style="font-size: 11px; color:#888;">Q: ${ep.qualities ? Object.keys(ep.qualities).join(', ') : 'N/A'}</p>
+                                    </div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <!-- Episode Edit Button -->
+                                        <button class="edit-btn" onclick="window.location.href='admin-episode-edit.html?series=${seriesId}&season=${encodeURIComponent(seasonName)}&ep=${ep.firebaseKey}'"><i class="fa-solid fa-pen"></i></button>
+                                        <!-- Episode Delete Button -->
+                                        <button class="edit-btn" style="border-color:#ff4d4d; color:#ff4d4d; background:rgba(255,77,77,0.1);" onclick="deleteEpisode('${seriesId}', '${seasonName}', '${ep.firebaseKey}', '${ep.title}')"><i class="fa-solid fa-trash"></i></button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    });
+                } else {
+                    epContainer.innerHTML = '<p class="loading-text">No Episodes added yet.</p>';
+                }
+            }
+        });
+    }
+
+    // Global function to delete Episode
+    window.deleteEpisode = (seriesId, seasonName, epKey, epTitle) => {
+        if(confirm(`Delete ${epTitle} from ${seasonName}?`)) {
+            db.ref(`content/${seriesId}/seasons/${seasonName}/${epKey}`).remove().then(() => {
+                alert("Episode Deleted!");
+            });
         }
     };
 
@@ -189,10 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
             <input type="hidden" class="link-url" value="${url}">
         `;
         container.appendChild(row);
-        document.getElementById(urlId).value = ''; // Clear URL input
+        document.getElementById(urlId).value = '';
     };
 
-    // Function to extract links from container
     function getLinksData(containerId) {
         const rows = document.querySelectorAll(`#${containerId} div`);
         let data = {};
@@ -213,13 +280,21 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        // Auto-select series if URL has series_id
+        const urlSeriesId = new URLSearchParams(window.location.search).get('series_id');
+        if(urlSeriesId) {
+            setTimeout(() => {
+                uploadTitleSelect.value = urlSeriesId;
+                uploadTitleSelect.dispatchEvent(new Event('change'));
+            }, 800);
+        }
+
         uploadTitleSelect.addEventListener('change', (e) => {
             const key = e.target.value;
             document.getElementById('uploadMovieFields').style.display = key && globalContentData[key].type === 'movie' ? 'block' : 'none';
             document.getElementById('uploadAnimeFields').style.display = key && globalContentData[key].type === 'anime' ? 'block' : 'none';
             document.getElementById('uploadSubmitBtn').style.display = key ? 'flex' : 'none';
             
-            // Clear all containers
             ['movieQualityContainer', 'movieAudioContainer', 'movieSubtitleContainer', 'animeQualityContainer', 'animeAudioContainer', 'animeSubtitleContainer'].forEach(id => {
                 if(document.getElementById(id)) document.getElementById(id).innerHTML = '';
             });
@@ -263,10 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 7. EDIT PAGE LOGIC (Dynamic Links) =================
+    // ================= 7. EDIT PAGE LOGIC (Basic Info + Movie Links) =================
     const editForm = document.getElementById('editForm');
     
-    // Function to add link in Edit Page
     window.addEditLink = (containerId, labelId, urlId) => {
         const label = document.getElementById(labelId).value;
         const url = document.getElementById(urlId).value.trim();
@@ -287,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(urlId).value = '';
     };
 
-    // Function to render existing links in Edit Page
     function renderExistingLinks(containerId, dataObj) {
         const container = document.getElementById(containerId);
         if(!container) return;
@@ -310,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to extract edited links
     function getEditLinksData(containerId) {
         const rows = document.querySelectorAll(`#${containerId} div`);
         let data = {};
@@ -326,7 +398,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const editId = new URLSearchParams(window.location.search).get('id');
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
 
-        // Fetch Data
         db.ref('content/' + editId).once('value').then(snapshot => {
             const data = snapshot.val();
             if(data) {
@@ -340,14 +411,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editSynopsis').value = data.synopsis || '';
 
-                // 🔥 FIX: Ab Data hamesha load hoga (Movie ho ya Anime)
                 renderExistingLinks('editQualityContainer', data.qualities);
                 renderExistingLinks('editAudioContainer', data.audios);
                 renderExistingLinks('editSubtitleContainer', data.subtitles);
             }
         });
 
-        // Update Data
         editForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('editId').value;
@@ -362,7 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 year: document.getElementById('editYear').value.trim(),
                 genres: document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('editSynopsis').value.trim(),
-                // 🔥 FIX: Links hamesha save honge
                 qualities: getEditLinksData('editQualityContainer'),
                 audios: getEditLinksData('editAudioContainer'),
                 subtitles: getEditLinksData('editSubtitleContainer')
@@ -374,7 +442,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(err => { status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; });
         });
 
-        // Delete Content Button
         const deleteBtn = document.getElementById('deleteBtn');
         if(deleteBtn) {
             deleteBtn.addEventListener('click', () => {
@@ -387,5 +454,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+    }
+
+
+    // ================= 8. EPISODE EDIT PAGE LOGIC =================
+    const episodeEditForm = document.getElementById('episodeEditForm');
+    if (episodeEditForm) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const seriesId = urlParams.get('series');
+        const seasonName = urlParams.get('season');
+        const epKey = urlParams.get('ep');
+
+        if (!seriesId || !seasonName || !epKey) { window.location.href = 'admin-dashboard.html'; }
+
+        const epRef = db.ref(`content/${seriesId}/seasons/${seasonName}/${epKey}`);
+
+        epRef.once('value').then(snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                document.getElementById('editEpNumber').value = data.ep || '';
+                document.getElementById('editEpTitle').value = data.title || '';
+                
+                renderExistingLinks('epQualityContainer', data.qualities);
+                renderExistingLinks('epAudioContainer', data.audios);
+                renderExistingLinks('epSubtitleContainer', data.subtitles);
+            }
+        });
+
+        episodeEditForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const status = document.getElementById('epEditStatus');
+            status.innerText = "Updating..."; status.style.color = "#a855f7";
+
+            const updatedEp = {
+                ep: parseInt(document.getElementById('editEpNumber').value),
+                title: document.getElementById('editEpTitle').value.trim(),
+                qualities: getEditLinksData('epQualityContainer'),
+                audios: getEditLinksData('epAudioContainer'),
+                subtitles: getEditLinksData('epSubtitleContainer')
+            };
+
+            epRef.update(updatedEp).then(() => {
+                status.innerText = "Episode Updated Successfully!";
+                status.style.color = "#22c55e";
+                setTimeout(() => { window.history.back(); }, 1000);
+            }).catch(err => {
+                status.innerText = "Error: " + err.message;
+                status.style.color = "#ff4d4d";
+            });
+        });
     }
 });
