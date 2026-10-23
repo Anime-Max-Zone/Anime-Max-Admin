@@ -102,8 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
                 
-                // Anime click par Series Page khulega, Movie click par Edit Page
-                const targetUrl = item.type === 'movie' ? `admin-edit.html?id=${key}` : `admin-series.html?id=${key}`;
+                // Anime click par Series Page khulega, Movie click par Edit Movie Page
+                const targetUrl = item.type === 'movie' ? `admin-movie-edit.html?id=${key}` : `admin-series.html?id=${key}`;
                 
                 const listHTML = `
                     <div class="list-item">
@@ -341,6 +341,59 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================= 7. EDIT PAGE LOGIC (Basic Info Only) =================
     const editForm = document.getElementById('editForm');
     
+    window.addEditLink = (containerId, labelId, urlId) => {
+        const label = document.getElementById(labelId).value;
+        const url = document.getElementById(urlId).value.trim();
+        if(!label || !url) { alert("Please fill Label and URL!"); return; }
+        
+        const container = document.getElementById(containerId);
+        const row = document.createElement('div');
+        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
+        row.innerHTML = `
+            <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <strong>${label}</strong>: <span style="color: #888;">${url}</span>
+            </div>
+            <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+            <input type="hidden" class="link-label" value="${label}">
+            <input type="hidden" class="link-url" value="${url}">
+        `;
+        container.appendChild(row);
+        document.getElementById(urlId).value = '';
+    };
+
+    function renderExistingLinks(containerId, dataObj) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        container.innerHTML = '';
+        if(dataObj) {
+            Object.keys(dataObj).forEach(label => {
+                const url = dataObj[label];
+                const row = document.createElement('div');
+                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
+                row.innerHTML = `
+                    <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        <strong>${label}</strong>: <span style="color: #888;">${url}</span>
+                    </div>
+                    <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+                    <input type="hidden" class="link-label" value="${label}">
+                    <input type="hidden" class="link-url" value="${url}">
+                `;
+                container.appendChild(row);
+            });
+        }
+    }
+
+    function getEditLinksData(containerId) {
+        const rows = document.querySelectorAll(`#${containerId} div`);
+        let data = {};
+        rows.forEach(row => {
+            if(row.querySelector('.link-label')) {
+                data[row.querySelector('.link-label').value] = row.querySelector('.link-url').value;
+            }
+        });
+        return data;
+    }
+
     if (editForm) {
         const editId = new URLSearchParams(window.location.search).get('id');
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
@@ -357,8 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editYear').value = data.year || '';
                 document.getElementById('editGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editSynopsis').value = data.synopsis || '';
-                
-                // 🔥 Removed links logic from here as requested
             }
         });
 
@@ -376,7 +427,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 year: document.getElementById('editYear').value.trim(),
                 genres: document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('editSynopsis').value.trim()
-                // 🔥 Removed links logic from here as requested
             };
 
             db.ref('content/' + id).update(updatedData).then(() => {
@@ -446,5 +496,73 @@ document.addEventListener('DOMContentLoaded', () => {
                 status.style.color = "#ff4d4d";
             });
         });
+    }
+
+    // ================= 9. MOVIE EDIT PAGE LOGIC (NEW) =================
+    const movieEditForm = document.getElementById('movieEditForm');
+    if (movieEditForm) {
+        const movieId = new URLSearchParams(window.location.search).get('id');
+        if(!movieId) { window.location.href = 'admin-dashboard.html'; return; }
+
+        const movieRef = db.ref('content/' + movieId);
+
+        // Load Data
+        movieRef.once('value').then(snapshot => {
+            const data = snapshot.val();
+            if(data) {
+                document.getElementById('editMovieId').value = movieId;
+                document.getElementById('editMovieTitle').value = data.title || '';
+                document.getElementById('editMovieType').value = 'Movie';
+                document.getElementById('editMovieImage').value = data.image || '';
+                document.getElementById('editMovieBanner').value = data.banner || '';
+                document.getElementById('editMovieRating').value = data.rating || '';
+                document.getElementById('editMovieYear').value = data.year || '';
+                document.getElementById('editMovieGenres').value = data.genres ? data.genres.join(', ') : '';
+                document.getElementById('editMovieSynopsis').value = data.synopsis || '';
+
+                // Load Links
+                renderExistingLinks('movieQaContainer', data.qualities);
+                renderExistingLinks('movieAuContainer', data.audios);
+                renderExistingLinks('movieSubContainer', data.subtitles);
+            }
+        });
+
+        // Update Data
+        movieEditForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const status = document.getElementById('movieEditStatus');
+            status.innerText = "Updating..."; status.style.color = "#a855f7";
+
+            const updatedData = {
+                title: document.getElementById('editMovieTitle').value.trim(),
+                image: document.getElementById('editMovieImage').value.trim(),
+                banner: document.getElementById('editMovieBanner').value.trim(),
+                rating: parseFloat(document.getElementById('editMovieRating').value) || 0,
+                year: document.getElementById('editMovieYear').value.trim(),
+                genres: document.getElementById('editMovieGenres').value.split(',').map(g => g.trim()).filter(g => g),
+                synopsis: document.getElementById('editMovieSynopsis').value.trim(),
+                qualities: getEditLinksData('movieQaContainer'),
+                audios: getEditLinksData('movieAuContainer'),
+                subtitles: getEditLinksData('movieSubContainer')
+            };
+
+            movieRef.update(updatedData).then(() => {
+                status.innerText = "Movie Updated Successfully! Redirecting..."; status.style.color = "#22c55e";
+                setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
+            }).catch(err => { status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; });
+        });
+
+        // Delete Movie
+        const deleteMovieBtn = document.getElementById('deleteMovieBtn');
+        if(deleteMovieBtn) {
+            deleteMovieBtn.addEventListener('click', () => {
+                if(confirm("Are you sure you want to delete this Movie?")) {
+                    movieRef.remove().then(() => {
+                        alert("Movie Deleted Successfully!");
+                        window.location.href = 'admin-dashboard.html';
+                    }).catch(err => alert("Error: " + err.message));
+                }
+            });
+        }
     }
 });
