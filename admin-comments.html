@@ -2,173 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Comment Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Manage Comments - Admin</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #0f0f13; color: #fff; padding: 20px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #333; }
-        .header h1 { font-size: 20px; color: #a855f7; }
-        .back-btn { color: #fff; text-decoration: none; background: #222; padding: 8px 15px; border-radius: 5px; font-size: 14px; }
-        
-        .comment-card { background: #1e1e24; border-radius: 10px; padding: 15px; margin-bottom: 15px; border-left: 4px solid #a855f7; position: relative; }
-        .comment-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; color: #aaa; }
-        .anime-title { color: #38bdf8; font-weight: bold; font-size: 12px; margin-bottom: 5px; display: block; }
-        .user-info { font-weight: bold; color: #fff; font-size: 14px; }
-        .user-email { font-size: 12px; color: #888; margin-left: 5px; }
-        .comment-text { font-size: 14px; line-height: 1.5; color: #ddd; margin-top: 10px; margin-bottom: 15px; }
-        
-        .delete-btn { background: #ef4444; color: #fff; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; transition: 0.2s; }
-        .delete-btn:hover { background: #dc2626; }
-        
-        .loader { text-align: center; margin-top: 50px; color: #888; }
-        .no-data { text-align: center; margin-top: 50px; color: #888; }
-        #login-warning { display: none; text-align: center; margin-top: 50px; color: #ef4444; }
-    </style>
+    
+    <!-- Firebase SDKs (Same version as admin.js) -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
+    <link rel="stylesheet" href="admin-style.css">
 </head>
-<body>
+<body class="admin-body dashboard-body">
 
-    <div class="header">
-        <h1><i class="fa-solid fa-comments"></i> Manage Comments</h1>
-        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
-    </div>
+    <!-- Header Section -->
+    <header class="admin-header">
+        <div class="logo-text">
+            <h1>Manage Comments</h1>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+            <!-- Back to Dashboard Button -->
+            <a href="admin-dashboard.html" class="logout-btn" style="border-color: #38bdf8; color: #38bdf8; text-decoration: none;" title="Back to Dashboard">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="logout-btn" title="Logout">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+    </header>
 
-    <div id="login-warning">
-        <h2><i class="fa-solid fa-lock"></i> Access Denied</h2>
-        <p>Aapko comments dekhne ke liye Admin ki tarah login hona hoga.</p>
-    </div>
+    <!-- Main Content Area -->
+    <main class="admin-main">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="color: #a855f7; font-size: 16px; margin: 0;"><i class="fa-solid fa-comments"></i> All User Comments</h3>
+            <span style="font-size: 12px; color: #888;" id="commentCount">0 Items</span>
+        </div>
+        
+        <!-- Comments List Container -->
+        <div id="commentListContainer" class="admin-list" style="margin-bottom: 50px;">
+            <p class="loading-text">Loading Comments...</p>
+        </div>
+    </main>
 
-    <div id="loader" class="loader">Loading comments...</div>
-    <div id="comments-container"></div>
+    <!-- Admin Bottom Navigation -->
+    <nav class="admin-bottom-nav">
+        <a href="admin-dashboard.html" class="admin-nav-item">
+            <i class="fa-solid fa-list"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-add-title.html" class="admin-nav-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Title</span>
+        </a>
+        <a href="admin-upload.html" class="admin-nav-item">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload</span>
+        </a>
+        <a href="admin-comments.html" class="admin-nav-item active">
+            <i class="fa-solid fa-comments"></i>
+            <span>Comments</span>
+        </a>
+    </nav>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
-    <script>
-        // ================= 1. FIREBASE SETUP =================
-        const firebaseConfig = {
-            apiKey: "AIzaSyCpfrluxsBhnz48ve9RykIy1IxzbBfk7dA",
-            authDomain: "sm-studio-7.firebaseapp.com",
-            databaseURL: "https://sm-studio-7-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "sm-studio-7",
-            storageBucket: "sm-studio-7.firebasestorage.app",
-            messagingSenderId: "126291501472",
-            appId: "1:126291501472:web:47386660af8ec3a57204c5",
-            measurementId: "G-4X9Q0761SB"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        const auth = firebase.auth();
-
-        const commentsContainer = document.getElementById('comments-container');
-        const loader = document.getElementById('loader');
-        const loginWarning = document.getElementById('login-warning');
-
-        // ================= 2. AUTH CHECK & DATA FETCH =================
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // User is logged in (Admin)
-                loginWarning.style.display = 'none';
-                loader.style.display = 'block';
-                fetchAllComments();
-            } else {
-                // Not logged in
-                loader.style.display = 'none';
-                commentsContainer.innerHTML = '';
-                loginWarning.style.display = 'block';
-            }
-        });
-
-        function fetchAllComments() {
-            // Humein saare comments aur content (title ke liye) chahiye
-            Promise.all([
-                database.ref('comments').once('value'),
-                database.ref('content').once('value')
-            ]).then(([commentsSnapshot, contentSnapshot]) => {
-                const commentsData = commentsSnapshot.val();
-                const contentData = contentSnapshot.val() || {};
-                
-                loader.style.display = 'none';
-                commentsContainer.innerHTML = '';
-
-                if (!commentsData) {
-                    commentsContainer.innerHTML = '<p class="no-data">Koi comment nahi mila.</p>';
-                    return;
-                }
-
-                let allComments = [];
-
-                // Data ko flatten karna (AnimeId -> CommentKey -> CommentData)
-                Object.keys(commentsData).forEach(animeId => {
-                    const animeTitle = contentData[animeId] ? contentData[animeId].title : 'Unknown Content';
-                    
-                    Object.keys(commentsData[animeId]).forEach(commentKey => {
-                        allComments.push({
-                            animeId: animeId,
-                            animeTitle: animeTitle,
-                            commentKey: commentKey,
-                            ...commentsData[animeId][commentKey]
-                        });
-                    });
-                });
-
-                // Sort by timestamp (Newest first)
-                allComments.sort((a, b) => b.timestamp - a.timestamp);
-
-                if (allComments.length === 0) {
-                    commentsContainer.innerHTML = '<p class="no-data">Koi comment nahi mila.</p>';
-                    return;
-                }
-
-                // Render Comments
-                allComments.forEach(comment => {
-                    const date = new Date(comment.timestamp);
-                    const timeString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                    const card = document.createElement('div');
-                    card.className = 'comment-card';
-                    card.innerHTML = `
-                        <span class="anime-title"><i class="fa-solid fa-film"></i> ${comment.animeTitle}</span>
-                        <div class="comment-header">
-                            <div>
-                                <span class="user-info">${comment.name}</span>
-                                <span class="user-email">(${comment.email})</span>
-                            </div>
-                            <span>${timeString}</span>
-                        </div>
-                        <p class="comment-text">${comment.text}</p>
-                        <button class="delete-btn" onclick="deleteComment('${comment.animeId}', '${comment.commentKey}')">
-                            <i class="fa-solid fa-trash"></i> Delete
-                        </button>
-                    `;
-                    commentsContainer.appendChild(card);
-                });
-
-            }).catch((error) => {
-                console.error("Error fetching data:", error);
-                loader.style.display = 'none';
-                commentsContainer.innerHTML = `<p class="no-data" style="color:red;">Error: ${error.message}</p>`;
-            });
-        }
-
-        // ================= 3. DELETE COMMENT =================
-        window.deleteComment = (animeId, commentKey) => {
-            if (confirm("Kya aap sach me yeh comment delete karna chahte hain?")) {
-                database.ref(`comments/${animeId}/${commentKey}`).remove()
-                    .then(() => {
-                        // Remove from UI immediately without reloading
-                        alert("Comment deleted successfully!");
-                        fetchAllComments(); // Refresh list
-                    })
-                    .catch((err) => alert("Error deleting comment: " + err.message));
-            }
-        };
-    </script>
+    <!-- Admin JS File (Handles Auth, Data Fetch, and Delete Logic) -->
+    <script src="admin.js"></script>
 </body>
 </html>
