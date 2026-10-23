@@ -290,6 +290,11 @@ textarea.admin-input {
     margin-top: 5px;
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
+    transition: all 0.2s;
+}
+
+.add-ep-btn:active {
+    transform: scale(0.98);
 }
 
 .submit-btn {
