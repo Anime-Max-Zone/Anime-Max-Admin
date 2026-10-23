@@ -528,4 +528,98 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+    // --- 2.10 ADMIN COMMENTS PAGE LOGIC ---
+    const commentListContainer = document.getElementById('commentListContainer');
+    if (commentListContainer) {
+        const commentCount = document.getElementById('commentCount');
+
+        function fetchAllComments() {
+            // Fetch comments and content data simultaneously
+            Promise.all([
+                db.ref('comments').once('value'),
+                db.ref('content').once('value')
+            ]).then(([commentsSnapshot, contentSnapshot]) => {
+                const commentsData = commentsSnapshot.val();
+                const contentData = contentSnapshot.val() || {};
+                
+                commentListContainer.innerHTML = '';
+
+                if (!commentsData) {
+                    commentListContainer.innerHTML = '<p class="loading-text">No comments found.</p>';
+                    if(commentCount) commentCount.innerText = '0 Items';
+                    return;
+                }
+
+                let allComments = [];
+
+                // Flatten the comments object
+                Object.keys(commentsData).forEach(animeId => {
+                    const animeTitle = contentData[animeId] ? contentData[animeId].title : 'Unknown Anime/Movie';
+                    
+                    Object.keys(commentsData[animeId]).forEach(commentKey => {
+                        allComments.push({
+                            animeId: animeId,
+                            animeTitle: animeTitle,
+                            commentKey: commentKey,
+                            ...commentsData[animeId][commentKey]
+                        });
+                    });
+                });
+
+                // Sort by newest first
+                allComments.sort((a, b) => b.timestamp - a.timestamp);
+                if(commentCount) commentCount.innerText = `${allComments.length} Items`;
+
+                if (allComments.length === 0) {
+                    commentListContainer.innerHTML = '<p class="loading-text">No comments found.</p>';
+                    return;
+                }
+
+                // Render Comments
+                allComments.forEach(comment => {
+                    const date = new Date(comment.timestamp);
+                    const timeString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                    const card = document.createElement('div');
+                    card.className = 'comment-card';
+                    card.innerHTML = `
+                        <span class="comment-anime-title"><i class="fa-solid fa-film"></i> ${comment.animeTitle}</span>
+                        <div class="comment-header">
+                            <div>
+                                <span class="comment-user">${comment.name}</span>
+                                <span class="comment-email">(${comment.email})</span>
+                            </div>
+                            <span>${timeString}</span>
+                        </div>
+                        <p class="comment-text">${comment.text}</p>
+                        <button class="comment-delete-btn" onclick="deleteAdminComment('${comment.animeId}', '${comment.commentKey}')">
+                            <i class="fa-solid fa-trash"></i> Delete
+                        </button>
+                    `;
+                    commentListContainer.appendChild(card);
+                });
+
+            }).catch((error) => {
+                console.error("Error fetching comments:", error);
+                commentListContainer.innerHTML = `<p class="loading-text" style="color:red;">Error: ${error.message}</p>`;
+            });
+        }
+
+        // Initial fetch
+        fetchAllComments();
+
+        // Delete Comment Function
+        window.deleteAdminComment = (animeId, commentKey) => {
+            if (confirm("Are you sure you want to delete this comment?")) {
+                db.ref(`comments/${animeId}/${commentKey}`).remove()
+                    .then(() => {
+                        // Refresh the comments list immediately
+                        fetchAllComments(); 
+                    })
+                    .catch((err) => alert("Error deleting comment: " + err.message));
+            }
+        };
+    }
+
 });
