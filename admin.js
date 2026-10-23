@@ -19,35 +19,89 @@ const db = firebase.database();
 
 let globalContentData = {}; 
 
-// ================= 2. GLOBAL AUTHENTICATION & PAGE PROTECTION =================
+// ================= GLOBAL HELPER FUNCTIONS (Har page ke liye zaroori) =================
+// Ye functions yahan isliye rakhe gaye hain taaki HTML ke onclick se direct call ho sakein
+
+window.addLink = (containerId, labelId, urlId) => {
+    const label = document.getElementById(labelId).value;
+    const url = document.getElementById(urlId).value.trim();
+    if(!label || !url) { alert("Please fill Label and URL!"); return; }
+
+    const container = document.getElementById(containerId);
+    const row = document.createElement('div');
+    row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
+    row.innerHTML = `
+        <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            <strong>${label}</strong>: <span style="color: #888;">${url}</span>
+        </div>
+        <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+        <input type="hidden" class="link-label" value="${label}">
+        <input type="hidden" class="link-url" value="${url}">
+    `;
+    container.appendChild(row);
+    document.getElementById(urlId).value = ''; // Clear input
+};
+
+window.getLinksData = (containerId) => {
+    const rows = document.querySelectorAll(`#${containerId} div`);
+    let data = {};
+    rows.forEach(row => {
+        if(row.querySelector('.link-label')) {
+            data[row.querySelector('.link-label').value] = row.querySelector('.link-url').value;
+        }
+    });
+    return data;
+};
+
+window.renderExistingLinks = (containerId, dataObj) => {
+    const container = document.getElementById(containerId);
+    if(!container) return;
+    container.innerHTML = '';
+    if(dataObj && Object.keys(dataObj).length > 0) {
+        Object.keys(dataObj).forEach(label => {
+            const url = dataObj[label];
+            const row = document.createElement('div');
+            row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
+            row.innerHTML = `
+                <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <strong>${label}</strong>: <span style="color: #888;">${url}</span>
+                </div>
+                <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+                <input type="hidden" class="link-label" value="${label}">
+                <input type="hidden" class="link-url" value="${url}">
+            `;
+            container.appendChild(row);
+        });
+    } else {
+        container.innerHTML = '<p style="font-size: 12px; color: #888; padding: 5px;">No links added yet.</p>';
+    }
+};
+
+// ================= 2. MAIN APP LOGIC =================
 document.addEventListener('DOMContentLoaded', () => {
     
+    // --- 2.1 LOGOUT & PAGE PROTECTION ---
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            // Logout hone par index.html par bhejein
             auth.signOut().then(() => { window.location.href = 'index.html'; });
         });
     }
 
     auth.onAuthStateChanged((user) => {
         const path = window.location.href;
-        // Check karein ki user Login page par hai ya nahi (chahe URL / ho ya /index.html)
         const isLoginPage = path.endsWith('/') || path.includes('index.html');
         
-        // Agar logged in hai aur login page par hai, toh Dashboard bhejo
         if (user && isLoginPage) {
             window.location.href = 'admin-dashboard.html';
         }
-        
-        // Agar logged out hai aur kisi protected page par hai, toh Login (index.html) bhejo
         if (!user && !isLoginPage) {
             window.location.href = 'index.html';
         }
     });
 
 
-    // ================= 3. LOGIN PAGE LOGIC =================
+    // --- 2.2 LOGIN PAGE LOGIC ---
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
@@ -96,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // ================= 4. DASHBOARD PAGE LOGIC =================
+    // --- 2.3 DASHBOARD PAGE LOGIC ---
     const animeListContainer = document.getElementById('animeListContainer');
     const movieListContainer = document.getElementById('movieListContainer');
 
@@ -110,8 +164,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
-                
-                // Anime click par Series Page khulega, Movie click par Movie Edit Page
                 const targetUrl = item.type === 'movie' ? `admin-movie-edit.html?id=${key}` : `admin-series.html?id=${key}`;
                 
                 const listHTML = `
@@ -139,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Global Delete Function for Dashboard
     window.deleteItem = (id, title) => {
         if(confirm(`Are you sure you want to permanently delete "${title}"? This action cannot be undone!`)) {
             db.ref('content/' + id).remove().then(() => {
@@ -149,17 +200,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // ================= 4.5 SERIES DETAILS PAGE LOGIC =================
+    // --- 2.4 SERIES DETAILS PAGE LOGIC ---
     const seriesInfoCard = document.getElementById('seriesInfoCard');
     if (seriesInfoCard) {
         const seriesId = new URLSearchParams(window.location.search).get('id');
         if (!seriesId) { window.location.href = 'admin-dashboard.html'; }
 
-        // Edit aur Add Episode Buttons
         document.getElementById('editSeriesBtn').onclick = () => window.location.href = `admin-edit.html?id=${seriesId}`;
         document.getElementById('uploadEpBtn').onclick = () => window.location.href = `admin-upload.html?series_id=${seriesId}`;
 
-        // Series Data aur Episodes List Load karein
         db.ref('content/' + seriesId).on('value', snapshot => {
             const data = snapshot.val();
             if(data) {
@@ -173,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if(data.seasons) {
                     Object.keys(data.seasons).forEach(seasonName => {
-                        // Season Header
                         epContainer.innerHTML += `<h4 style="color: #a855f7; margin: 15px 0 10px 0;">${seasonName}</h4>`;
                         
                         const episodes = data.seasons[seasonName];
@@ -187,9 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         <p style="font-size: 11px; color:#888;">Q: ${ep.qualities ? Object.keys(ep.qualities).join(', ') : 'N/A'}</p>
                                     </div>
                                     <div style="display: flex; gap: 8px;">
-                                        <!-- Episode Edit Button -->
                                         <button class="edit-btn" onclick="window.location.href='admin-episode-edit.html?series=${seriesId}&season=${encodeURIComponent(seasonName)}&ep=${ep.firebaseKey}'"><i class="fa-solid fa-pen"></i></button>
-                                        <!-- Episode Delete Button -->
                                         <button class="edit-btn" style="border-color:#ff4d4d; color:#ff4d4d; background:rgba(255,77,77,0.1);" onclick="deleteEpisode('${seriesId}', '${seasonName}', '${ep.firebaseKey}', '${ep.title}')"><i class="fa-solid fa-trash"></i></button>
                                     </div>
                                 </div>
@@ -203,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Global function to delete Episode
     window.deleteEpisode = (seriesId, seasonName, epKey, epTitle) => {
         if(confirm(`Delete ${epTitle} from ${seasonName}?`)) {
             db.ref(`content/${seriesId}/seasons/${seasonName}/${epKey}`).remove().then(() => {
@@ -213,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // ================= 5. ADD TITLE PAGE LOGIC =================
+    // --- 2.5 ADD TITLE PAGE LOGIC ---
     const addTitleForm = document.getElementById('addTitleForm');
     if (addTitleForm) {
         addTitleForm.addEventListener('submit', (e) => {
@@ -244,40 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 6. UPLOAD PAGE LOGIC (Dynamic Dropdowns) =================
+    // --- 2.6 UPLOAD PAGE LOGIC ---
     const uploadTitleSelect = document.getElementById('uploadTitleSelect');
-    
-    window.addLink = (containerId, labelId, urlId) => {
-        const label = document.getElementById(labelId).value;
-        const url = document.getElementById(urlId).value.trim();
-        if(!label || !url) { alert("Please fill Label and URL!"); return; }
-
-        const container = document.getElementById(containerId);
-        const row = document.createElement('div');
-        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
-        row.innerHTML = `
-            <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong>${label}</strong>: <span style="color: #888;">${url}</span>
-            </div>
-            <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-            <input type="hidden" class="link-label" value="${label}">
-            <input type="hidden" class="link-url" value="${url}">
-        `;
-        container.appendChild(row);
-        document.getElementById(urlId).value = '';
-    };
-
-    function getLinksData(containerId) {
-        const rows = document.querySelectorAll(`#${containerId} div`);
-        let data = {};
-        rows.forEach(row => {
-            if(row.querySelector('.link-label')) {
-                data[row.querySelector('.link-label').value] = row.querySelector('.link-url').value;
-            }
-        });
-        return data;
-    }
-
     if (uploadTitleSelect) {
         db.ref('content').on('value', (snapshot) => {
             globalContentData = snapshot.val() || {};
@@ -344,9 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 7. EDIT PAGE LOGIC (Basic Info Only) =================
+    // --- 2.7 EDIT SERIES INFO PAGE ---
     const editForm = document.getElementById('editForm');
-    
     if (editForm) {
         const editId = new URLSearchParams(window.location.search).get('id');
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
@@ -403,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 8. EPISODE EDIT PAGE LOGIC =================
+    // --- 2.8 EDIT EPISODE PAGE ---
     const episodeEditForm = document.getElementById('episodeEditForm');
     if (episodeEditForm) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -421,6 +433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editEpNumber').value = data.ep || '';
                 document.getElementById('editEpTitle').value = data.title || '';
                 
+                // Global function call
                 renderExistingLinks('epQualityContainer', data.qualities);
                 renderExistingLinks('epAudioContainer', data.audios);
                 renderExistingLinks('epSubtitleContainer', data.subtitles);
@@ -435,9 +448,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const updatedEp = {
                 ep: parseInt(document.getElementById('editEpNumber').value),
                 title: document.getElementById('editEpTitle').value.trim(),
-                qualities: getEditLinksData('epQualityContainer'),
-                audios: getEditLinksData('epAudioContainer'),
-                subtitles: getEditLinksData('epSubtitleContainer')
+                qualities: getLinksData('epQualityContainer'),
+                audios: getLinksData('epAudioContainer'),
+                subtitles: getLinksData('epSubtitleContainer')
             };
 
             epRef.update(updatedEp).then(() => {
@@ -451,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ================= 9. MOVIE EDIT PAGE LOGIC =================
+    // --- 2.9 EDIT MOVIE PAGE ---
     const movieEditForm = document.getElementById('movieEditForm');
     if (movieEditForm) {
         const movieId = new URLSearchParams(window.location.search).get('id');
@@ -472,6 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editMovieGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editMovieSynopsis').value = data.synopsis || '';
 
+                // Global function call
                 renderExistingLinks('movieQaContainer', data.qualities);
                 renderExistingLinks('movieAuContainer', data.audios);
                 renderExistingLinks('movieSubContainer', data.subtitles);
@@ -491,9 +505,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 year: document.getElementById('editMovieYear').value.trim(),
                 genres: document.getElementById('editMovieGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('editMovieSynopsis').value.trim(),
-                qualities: getEditLinksData('movieQaContainer'),
-                audios: getEditLinksData('movieAuContainer'),
-                subtitles: getEditLinksData('movieSubContainer')
+                qualities: getLinksData('movieQaContainer'),
+                audios: getLinksData('movieAuContainer'),
+                subtitles: getLinksData('movieSubContainer')
             };
 
             movieRef.update(updatedData).then(() => {
