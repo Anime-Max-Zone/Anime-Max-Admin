@@ -4,44 +4,84 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard - Admin</title>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
-        <div class="logo-text"><h1>Admin Dashboard</h1></div>
-        <div style="display: flex; gap: 10px;">
-            <a href="https://anime-max-zone.github.io/Anime-Max-Zone/index.html" target="_blank" class="logout-btn" style="border-color: #22c55e; color: #22c55e; text-decoration: none;"><i class="fa-solid fa-globe"></i> App</a>
-            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i></button>
+        <div class="logo-text">
+            <h1>Admin Dashboard</h1>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- Quick Add Button (Mobile Friendly) -->
+            <a href="admin-add-title.html" class="logout-btn" style="border-color: #a855f7; color: #a855f7; text-decoration: none; padding: 8px 12px;">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            <!-- Visit App Button -->
+            <a href="https://anime-max-zone.github.io/Anime-Max-Zone/index.html" target="_blank" class="logout-btn" style="border-color: #22c55e; color: #22c55e; text-decoration: none; padding: 8px 12px;">
+                <i class="fa-solid fa-globe"></i>
+            </a>
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="logout-btn" style="padding: 8px 12px;">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
         </div>
     </header>
 
+    <!-- Main Content Area -->
     <main class="admin-main">
         <h2 class="view-title">All Content</h2>
         
-        <h3 class="section-title" style="color: #a855f7; margin-bottom: 15px; font-size: 16px;">Anime Series</h3>
+        <!-- Anime Section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="color: #a855f7; font-size: 16px; margin: 0;">Anime Series</h3>
+            <span style="font-size: 12px; color: #888;" id="animeCount">0 Items</span>
+        </div>
         <div id="animeListContainer" class="admin-list">
             <p class="loading-text">Loading Anime...</p>
         </div>
 
-        <h3 class="section-title" style="color: #a855f7; margin-top: 30px; margin-bottom: 15px; font-size: 16px;">Movies</h3>
+        <!-- Movies Section -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; margin-bottom: 15px;">
+            <h3 style="color: #a855f7; font-size: 16px; margin: 0;">Movies</h3>
+            <span style="font-size: 12px; color: #888;" id="movieCount">0 Items</span>
+        </div>
         <div id="movieListContainer" class="admin-list">
             <p class="loading-text">Loading Movies...</p>
         </div>
     </main>
 
-    <!-- Admin Bottom Nav -->
+    <!-- Admin Bottom Navigation -->
     <nav class="admin-bottom-nav">
-        <a href="admin-dashboard.html" class="admin-nav-item active"><i class="fa-solid fa-list"></i><span>Dashboard</span></a>
-        <a href="admin-add-title.html" class="admin-nav-item"><i class="fa-solid fa-plus"></i><span>Add Title</span></a>
-        <a href="admin-upload.html" class="admin-nav-item"><i class="fa-solid fa-upload"></i><span>Upload</span></a>
+        <a href="admin-dashboard.html" class="admin-nav-item active">
+            <i class="fa-solid fa-list"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-add-title.html" class="admin-nav-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Title</span>
+        </a>
+        <a href="admin-upload.html" class="admin-nav-item">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload</span>
+        </a>
     </nav>
 
+    <!-- Admin JS File (Data Load & Auth) -->
     <script src="admin.js"></script>
 </body>
 </html>
