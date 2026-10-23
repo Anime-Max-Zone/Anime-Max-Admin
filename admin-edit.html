@@ -4,36 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Edit Content - Admin</title>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
-        <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none; padding: 8px 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
         <div class="logo-text"><h1>Edit Title</h1></div>
+        <div style="width: 70px;"></div>
     </header>
 
+    <!-- Main Content -->
     <main class="admin-main">
         <form id="editForm" class="form-container">
+            <!-- Hidden ID -->
             <input type="hidden" id="editId">
+            
+            <!-- Title & Type (Read Only Type) -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Title</label>
                     <input type="text" id="editTitle" class="admin-input" required>
                 </div>
                 <div class="input-group">
+                    <label>Content Type</label>
+                    <input type="text" id="editType" class="admin-input" readonly style="background: #13131a; color: #888;">
+                </div>
+            </div>
+
+            <!-- Poster & Banner -->
+            <div class="form-row">
+                <div class="input-group">
                     <label>Poster Image URL</label>
                     <input type="url" id="editImage" class="admin-input" required>
                 </div>
+                <div class="input-group">
+                    <label>Banner Image URL (Optional)</label>
+                    <input type="url" id="editBanner" class="admin-input">
+                </div>
             </div>
+
+            <!-- Rating & Year -->
             <div class="form-row">
                 <div class="input-group">
-                    <label>Rating</label>
+                    <label>Rating (0-10)</label>
                     <input type="number" id="editRating" class="admin-input" step="0.1">
                 </div>
                 <div class="input-group">
@@ -41,16 +71,32 @@
                     <input type="text" id="editYear" class="admin-input">
                 </div>
             </div>
+
+            <!-- Genres -->
             <div class="input-group full-width">
-                <label>Synopsis</label>
-                <textarea id="editSynopsis" class="admin-input" rows="3"></textarea>
+                <label>Genres (Comma separated)</label>
+                <input type="text" id="editGenres" class="admin-input" placeholder="Action, Fantasy">
+            </div>
+
+            <!-- Synopsis -->
+            <div class="input-group full-width">
+                <label>Synopsis / Description</label>
+                <textarea id="editSynopsis" class="admin-input" rows="4"></textarea>
             </div>
             
+            <!-- Update Button -->
             <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-check"></i> Update Info</button>
             <p id="editStatus" class="success-msg"></p>
         </form>
+
+        <!-- Delete Section -->
+        <div style="margin-top: 30px; padding: 20px; border: 1px dashed #ff4d4d; border-radius: 10px; text-align: center;">
+            <p style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px;">Danger Zone: Delete this title permanently?</p>
+            <button id="deleteBtn" class="logout-btn" style="width: 100%; justify-content: center; padding: 12px;"><i class="fa-solid fa-trash"></i> Delete Content</button>
+        </div>
     </main>
 
+    <!-- Admin JS File -->
     <script src="admin.js"></script>
 </body>
 </html>
