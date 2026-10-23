@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Upload - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body class="admin-body dashboard-body">
+
+    <header class="admin-header">
+        <div class="logo-text"><h1>Upload Content</h1></div>
+    </header>
+
+    <main class="admin-main">
+        <form id="uploadForm" class="form-container">
+            <div class="input-group full-width" style="margin-bottom: 20px;">
+                <label>Select Anime or Movie</label>
+                <select id="uploadTitleSelect" class="admin-input" required>
+                    <option value="">-- Loading Content... --</option>
+                </select>
+            </div>
+
+            <!-- Movie Upload Fields -->
+            <div id="uploadMovieFields" style="display: none;">
+                <div class="input-group full-width">
+                    <label>Google Drive Video ID / URL</label>
+                    <input type="text" id="movieVideoId" class="admin-input" placeholder="Enter GDrive ID">
+                </div>
+            </div>
+
+            <!-- Anime Upload Fields -->
+            <div id="uploadAnimeFields" style="display: none;">
+                <div class="input-group full-width" style="margin-bottom: 15px;">
+                    <label>Season Name</label>
+                    <input type="text" id="uploadSeasonName" class="admin-input" value="Season 1">
+                </div>
+                <div class="season-box">
+                    <h4>Add New Episode</h4>
+                    <div class="ep-row">
+                        <input type="number" id="newEpNumber" class="admin-input" placeholder="Ep No." style="width: 80px;">
+                        <input type="text" id="newEpTitle" class="admin-input" placeholder="Episode Title">
+                        <input type="text" id="newEpVideoId" class="admin-input" placeholder="GDrive ID / Link">
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="admin-btn submit-btn" id="uploadSubmitBtn" style="display: none;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Content</button>
+            <p id="uploadStatus" class="success-msg"></p>
+        </form>
+    </main>
+
+    <!-- Admin Bottom Nav -->
+    <nav class="admin-bottom-nav">
+        <a href="admin-dashboard.html" class="admin-nav-item"><i class="fa-solid fa-list"></i><span>Dashboard</span></a>
+        <a href="admin-add-title.html" class="admin-nav-item"><i class="fa-solid fa-plus"></i><span>Add Title</span></a>
+        <a href="admin-upload.html" class="admin-nav-item active"><i class="fa-solid fa-upload"></i><span>Upload</span></a>
+    </nav>
+
+    <script src="admin.js"></script>
+</body>
+</html>
