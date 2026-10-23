@@ -34,6 +34,7 @@
     <main class="admin-main">
         <form id="addTitleForm" class="form-container">
             
+            <!-- Type & Title -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Content Type</label>
@@ -48,6 +49,7 @@
                 </div>
             </div>
 
+            <!-- Poster & Banner -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Poster Image URL</label>
@@ -59,6 +61,7 @@
                 </div>
             </div>
 
+            <!-- Rating & Year -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Rating (0-10)</label>
@@ -70,16 +73,19 @@
                 </div>
             </div>
 
+            <!-- Genres -->
             <div class="input-group full-width">
                 <label>Genres (Comma separated)</label>
                 <input type="text" id="addGenres" class="admin-input" placeholder="Action, Fantasy">
             </div>
 
+            <!-- Synopsis -->
             <div class="input-group full-width">
                 <label>Synopsis / Description</label>
                 <textarea id="addSynopsis" class="admin-input" rows="4" placeholder="Enter story..."></textarea>
             </div>
 
+            <!-- Submit Button -->
             <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-save"></i> Save Title</button>
             
             <!-- Success/Error Message Display -->
