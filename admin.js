@@ -23,6 +23,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    // ================= GOOGLE REDIRECT RESULT CHECK =================
+    // Ye check karega ki agar user redirect hokar wapas aaya hai (Agar popup block hua tha)
+    auth.getRedirectResult().then((result) => {
+        if (result.user) {
+            window.location.href = 'admin-dashboard.html'; 
+        }
+    }).catch((error) => {
+        if (loginError) {
+            loginError.innerText = "Google Auth Error: " + error.message;
+            loginError.style.color = "#ff4d4d";
+        }
+    });
 
     // Email/Password Login
     if (loginBtn) {
@@ -48,13 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch((error) => {
                     console.error("Login Error:", error);
-                    // Error code ke hisaab se message
                     if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
                         loginError.innerText = "Invalid Email or Password!";
                     } else if (error.code === 'auth/network-request-failed') {
                         loginError.innerText = "Network Error! Check your internet.";
-                    } else if (error.code === 'auth/operation-not-allowed') {
-                        loginError.innerText = "Email/Password login is not enabled in Firebase.";
                     } else {
                         loginError.innerText = error.message;
                     }
@@ -63,30 +74,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Google Login
+    // Google Login (Fixed for Mobile)
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithRedirect(provider).catch((error) => {
-                loginError.innerText = "Google Error: " + error.message;
-                loginError.style.color = "#ff4d4d";
-            });
+            
+            loginError.innerText = "Opening Google Login...";
+            loginError.style.color = "#a855f7";
+
+            // Sabse pehle Popup try karenge (Mobile me zyada reliable hai)
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    alert("Google Login Successful!");
+                    window.location.href = 'admin-dashboard.html';
+                })
+                .catch((error) => {
+                    console.error("Google Popup Error:", error);
+                    // Agar popup block ho jaye, toh Redirect try karo
+                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+                        loginError.innerText = "Popup blocked. Redirecting...";
+                        auth.signInWithRedirect(provider);
+                    } else {
+                        loginError.innerText = "Google Error: " + error.message;
+                        loginError.style.color = "#ff4d4d";
+                    }
+                });
         });
     }
-
-    // Check Google Redirect Result (Jab user Google se wapas aaye)
-    auth.getRedirectResult().then((result) => {
-        if (result.user) {
-            alert("Google Login Successful!");
-            window.location.href = 'admin-dashboard.html'; 
-        }
-    }).catch((error) => {
-        if (loginError) {
-            loginError.innerText = "Google Auth Error: " + error.message;
-            loginError.style.color = "#ff4d4d";
-        }
-    });
 
     // Auth State Change (Dashboard Protect karega)
     auth.onAuthStateChanged((user) => {
@@ -96,12 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ================= 3. DASHBOARD LOGIC (Agar Dashboard par hain toh) =================
+    // ================= 3. DASHBOARD LOGIC =================
     const contentType = document.getElementById('contentType');
     const dynamicFields = document.getElementById('dynamicFields');
     const contentForm = document.getElementById('contentForm');
     const uploadStatus = document.getElementById('uploadStatus');
-    const logoutBtn = document.getElementById('logoutBtn');
 
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
