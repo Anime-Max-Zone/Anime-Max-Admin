@@ -19,25 +19,21 @@ const db = firebase.database();
 
 // ================= 2. AUTHENTICATION LOGIC =================
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Admin JS Loaded!");
-
+    
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
-    const logoutBtn = document.getElementById('logoutBtn');
 
     // Email/Password Login
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
-            // 🔥 SABSE ZAROORI FIX: Page refresh hone se rokna
-            e.preventDefault(); 
-            console.log("Login Button Clicked!");
+            e.preventDefault(); // Page refresh rokne ke liye
 
-            const email = document.getElementById('adminEmail').value;
+            const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
             
             if(!email || !password) {
-                loginError.innerText = "Please enter both Email and Password.";
+                loginError.innerText = "Please enter Email and Password.";
                 loginError.style.color = "#ff4d4d";
                 return;
             }
@@ -47,18 +43,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    console.log("Login Success:", userCredential.user);
-                    alert("Login Successful! Redirecting to Dashboard...");
+                    alert("Login Successful!");
                     window.location.href = 'admin-dashboard.html'; 
                 })
                 .catch((error) => {
-                    console.error("Firebase Login Error:", error);
-                    loginError.innerText = "Error: " + error.message;
+                    console.error("Login Error:", error);
+                    // Error code ke hisaab se message
+                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+                        loginError.innerText = "Invalid Email or Password!";
+                    } else if (error.code === 'auth/network-request-failed') {
+                        loginError.innerText = "Network Error! Check your internet.";
+                    } else if (error.code === 'auth/operation-not-allowed') {
+                        loginError.innerText = "Email/Password login is not enabled in Firebase.";
+                    } else {
+                        loginError.innerText = error.message;
+                    }
                     loginError.style.color = "#ff4d4d";
                 });
         });
-    } else {
-        console.error("Login button not found! Check if ID is 'loginBtn'");
     }
 
     // Google Login
@@ -68,22 +70,39 @@ document.addEventListener('DOMContentLoaded', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithRedirect(provider).catch((error) => {
                 loginError.innerText = "Google Error: " + error.message;
+                loginError.style.color = "#ff4d4d";
             });
         });
     }
 
-    // Check Google Redirect Result
+    // Check Google Redirect Result (Jab user Google se wapas aaye)
     auth.getRedirectResult().then((result) => {
         if (result.user) {
+            alert("Google Login Successful!");
             window.location.href = 'admin-dashboard.html'; 
         }
     }).catch((error) => {
         if (loginError) {
-            loginError.innerText = error.message;
+            loginError.innerText = "Google Auth Error: " + error.message;
+            loginError.style.color = "#ff4d4d";
         }
     });
 
-    // Logout
+    // Auth State Change (Dashboard Protect karega)
+    auth.onAuthStateChanged((user) => {
+        const path = window.location.href;
+        if (user && path.includes('admin-login.html')) {
+            window.location.href = 'admin-dashboard.html';
+        }
+    });
+
+    // ================= 3. DASHBOARD LOGIC (Agar Dashboard par hain toh) =================
+    const contentType = document.getElementById('contentType');
+    const dynamicFields = document.getElementById('dynamicFields');
+    const contentForm = document.getElementById('contentForm');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const logoutBtn = document.getElementById('logoutBtn');
+
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             auth.signOut().then(() => {
@@ -91,30 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     }
-
-    // Auth State Change (Page Protection)
-    auth.onAuthStateChanged((user) => {
-        const path = window.location.pathname;
-        
-        if (user) {
-            // Agar logged in hai aur login page par hai
-            if (path.includes('login.html')) {
-                window.location.href = 'admin-dashboard.html';
-            }
-        } else {
-            // Agar logged out hai aur dashboard par hai
-            if (path.includes('dashboard.html')) {
-                window.location.href = 'admin-login.html';
-            }
-        }
-    });
-
-
-    // ================= 3. DASHBOARD DYNAMIC FORM LOGIC =================
-    const contentType = document.getElementById('contentType');
-    const dynamicFields = document.getElementById('dynamicFields');
-    const contentForm = document.getElementById('contentForm');
-    const uploadStatus = document.getElementById('uploadStatus');
 
     if (contentType) {
         contentType.addEventListener('change', () => {
@@ -157,8 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         contentType.dispatchEvent(new Event('change'));
     }
 
-
-    // ================= 4. FORM SUBMIT (UPLOAD DATA TO FIREBASE) =================
     if (contentForm) {
         contentForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -173,12 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadStatus.style.color = "#a855f7";
 
             const type = contentType.value;
-            const title = document.getElementById('contentTitle').value;
-            const image = document.getElementById('contentImage').value;
-            const banner = document.getElementById('contentBanner').value || image;
-            const rating = document.getElementById('contentRating').value;
-            const year = document.getElementById('contentYear').value;
-            const synopsis = document.getElementById('contentSynopsis').value;
+            const title = document.getElementById('contentTitle').value.trim();
+            const image = document.getElementById('contentImage').value.trim();
+            const banner = document.getElementById('contentBanner').value.trim() || image;
+            const rating = parseFloat(document.getElementById('contentRating').value) || 0;
+            const year = parseInt(document.getElementById('contentYear').value) || new Date().getFullYear();
+            const synopsis = document.getElementById('contentSynopsis').value.trim();
             
             const genresString = document.getElementById('contentGenres').value;
             const genres = genresString.split(',').map(g => g.trim()).filter(g => g);
@@ -189,16 +182,16 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             if (type === 'movie') {
-                finalData.gdrive_id = document.getElementById('movieVideoId').value;
+                finalData.gdrive_id = document.getElementById('movieVideoId').value.trim();
             } else {
                 const epRows = document.querySelectorAll('#episodesContainer .ep-row');
                 let episodesArray = [];
                 epRows.forEach(row => {
                     const inputs = row.querySelectorAll('input');
                     episodesArray.push({
-                        ep: inputs[0].value,
-                        title: inputs[1].value,
-                        gdrive_id: inputs[2].value
+                        ep: parseInt(inputs[0].value),
+                        title: inputs[1].value.trim(),
+                        gdrive_id: inputs[2].value.trim()
                     });
                 });
                 finalData.seasons = { "Season 1": episodesArray };
