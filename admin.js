@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
                 
-                // Anime click par Series Page khulega, Movie click par Edit Movie Page
+                // 🔥 FIX: Anime click par Series Page khulega, Movie click par Movie Edit Page
                 const targetUrl = item.type === 'movie' ? `admin-movie-edit.html?id=${key}` : `admin-series.html?id=${key}`;
                 
                 const listHTML = `
@@ -238,11 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================= 6. UPLOAD PAGE LOGIC (Dynamic Dropdowns) =================
     const uploadTitleSelect = document.getElementById('uploadTitleSelect');
     
-    // Function to Add Link (Quality/Audio/Subtitle)
     window.addLink = (containerId, labelId, urlId) => {
         const label = document.getElementById(labelId).value;
         const url = document.getElementById(urlId).value.trim();
-
         if(!label || !url) { alert("Please fill Label and URL!"); return; }
 
         const container = document.getElementById(containerId);
@@ -280,7 +278,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Auto-select series if URL has series_id
         const urlSeriesId = new URLSearchParams(window.location.search).get('series_id');
         if(urlSeriesId) {
             setTimeout(() => {
@@ -341,59 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ================= 7. EDIT PAGE LOGIC (Basic Info Only) =================
     const editForm = document.getElementById('editForm');
     
-    window.addEditLink = (containerId, labelId, urlId) => {
-        const label = document.getElementById(labelId).value;
-        const url = document.getElementById(urlId).value.trim();
-        if(!label || !url) { alert("Please fill Label and URL!"); return; }
-        
-        const container = document.getElementById(containerId);
-        const row = document.createElement('div');
-        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
-        row.innerHTML = `
-            <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong>${label}</strong>: <span style="color: #888;">${url}</span>
-            </div>
-            <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-            <input type="hidden" class="link-label" value="${label}">
-            <input type="hidden" class="link-url" value="${url}">
-        `;
-        container.appendChild(row);
-        document.getElementById(urlId).value = '';
-    };
-
-    function renderExistingLinks(containerId, dataObj) {
-        const container = document.getElementById(containerId);
-        if(!container) return;
-        container.innerHTML = '';
-        if(dataObj) {
-            Object.keys(dataObj).forEach(label => {
-                const url = dataObj[label];
-                const row = document.createElement('div');
-                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
-                row.innerHTML = `
-                    <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        <strong>${label}</strong>: <span style="color: #888;">${url}</span>
-                    </div>
-                    <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                    <input type="hidden" class="link-label" value="${label}">
-                    <input type="hidden" class="link-url" value="${url}">
-                `;
-                container.appendChild(row);
-            });
-        }
-    }
-
-    function getEditLinksData(containerId) {
-        const rows = document.querySelectorAll(`#${containerId} div`);
-        let data = {};
-        rows.forEach(row => {
-            if(row.querySelector('.link-label')) {
-                data[row.querySelector('.link-label').value] = row.querySelector('.link-url').value;
-            }
-        });
-        return data;
-    }
-
     if (editForm) {
         const editId = new URLSearchParams(window.location.search).get('id');
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
@@ -498,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ================= 9. MOVIE EDIT PAGE LOGIC (NEW) =================
+    // ================= 9. MOVIE EDIT PAGE LOGIC =================
     const movieEditForm = document.getElementById('movieEditForm');
     if (movieEditForm) {
         const movieId = new URLSearchParams(window.location.search).get('id');
@@ -506,7 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const movieRef = db.ref('content/' + movieId);
 
-        // Load Data
         movieRef.once('value').then(snapshot => {
             const data = snapshot.val();
             if(data) {
@@ -520,14 +463,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editMovieGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editMovieSynopsis').value = data.synopsis || '';
 
-                // Load Links
                 renderExistingLinks('movieQaContainer', data.qualities);
                 renderExistingLinks('movieAuContainer', data.audios);
                 renderExistingLinks('movieSubContainer', data.subtitles);
             }
         });
 
-        // Update Data
         movieEditForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const status = document.getElementById('movieEditStatus');
@@ -552,7 +493,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(err => { status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; });
         });
 
-        // Delete Movie
         const deleteMovieBtn = document.getElementById('deleteMovieBtn');
         if(deleteMovieBtn) {
             deleteMovieBtn.addEventListener('click', () => {
