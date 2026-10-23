@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
                 
-                // 🔥 FIX: Anime click par Series Page khulega, Movie click par Edit Page
+                // Anime click par Series Page khulega, Movie click par Edit Page
                 const targetUrl = item.type === 'movie' ? `admin-edit.html?id=${key}` : `admin-series.html?id=${key}`;
                 
                 const listHTML = `
@@ -338,62 +338,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 7. EDIT PAGE LOGIC (Basic Info + Movie Links) =================
+    // ================= 7. EDIT PAGE LOGIC (Basic Info Only) =================
     const editForm = document.getElementById('editForm');
     
-    window.addEditLink = (containerId, labelId, urlId) => {
-        const label = document.getElementById(labelId).value;
-        const url = document.getElementById(urlId).value.trim();
-        if(!label || !url) { alert("Please fill Label and URL!"); return; }
-        
-        const container = document.getElementById(containerId);
-        const row = document.createElement('div');
-        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
-        row.innerHTML = `
-            <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                <strong>${label}</strong>: <span style="color: #888;">${url}</span>
-            </div>
-            <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-            <input type="hidden" class="link-label" value="${label}">
-            <input type="hidden" class="link-url" value="${url}">
-        `;
-        container.appendChild(row);
-        document.getElementById(urlId).value = '';
-    };
-
-    function renderExistingLinks(containerId, dataObj) {
-        const container = document.getElementById(containerId);
-        if(!container) return;
-        container.innerHTML = '';
-        if(dataObj) {
-            Object.keys(dataObj).forEach(label => {
-                const url = dataObj[label];
-                const row = document.createElement('div');
-                row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
-                row.innerHTML = `
-                    <div style="font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        <strong>${label}</strong>: <span style="color: #888;">${url}</span>
-                    </div>
-                    <button type="button" style="background:none; border:none; color:#ff4d4d; cursor:pointer;" onclick="this.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
-                    <input type="hidden" class="link-label" value="${label}">
-                    <input type="hidden" class="link-url" value="${url}">
-                `;
-                container.appendChild(row);
-            });
-        }
-    }
-
-    function getEditLinksData(containerId) {
-        const rows = document.querySelectorAll(`#${containerId} div`);
-        let data = {};
-        rows.forEach(row => {
-            if(row.querySelector('.link-label')) {
-                data[row.querySelector('.link-label').value] = row.querySelector('.link-url').value;
-            }
-        });
-        return data;
-    }
-
     if (editForm) {
         const editId = new URLSearchParams(window.location.search).get('id');
         if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
@@ -410,10 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editYear').value = data.year || '';
                 document.getElementById('editGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editSynopsis').value = data.synopsis || '';
-
-                renderExistingLinks('editQualityContainer', data.qualities);
-                renderExistingLinks('editAudioContainer', data.audios);
-                renderExistingLinks('editSubtitleContainer', data.subtitles);
+                
+                // 🔥 Removed links logic from here as requested
             }
         });
 
@@ -430,10 +375,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 rating: parseFloat(document.getElementById('editRating').value) || 0,
                 year: document.getElementById('editYear').value.trim(),
                 genres: document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(g => g),
-                synopsis: document.getElementById('editSynopsis').value.trim(),
-                qualities: getEditLinksData('editQualityContainer'),
-                audios: getEditLinksData('editAudioContainer'),
-                subtitles: getEditLinksData('editSubtitleContainer')
+                synopsis: document.getElementById('editSynopsis').value.trim()
+                // 🔥 Removed links logic from here as requested
             };
 
             db.ref('content/' + id).update(updatedData).then(() => {
