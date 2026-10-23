@@ -4,54 +4,67 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Login - Anime Max Zone</title>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     
-    <!-- Admin CSS -->
+    <!-- Admin CSS File (UI Fix yahan se aayega) -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body">
 
     <div class="login-container">
-        <div class="logo-area" style="justify-content: center; margin-bottom: 25px; flex-direction: column; text-align: center;">
-            <div class="logo-icon" style="margin-bottom: 10px;"><i class="fa-solid fa-play"></i></div>
+        <!-- Logo Section -->
+        <div class="logo-area" style="display: flex; justify-content: center; align-items: center; flex-direction: column; text-align: center; margin-bottom: 25px;">
+            <div class="logo-icon" style="margin-bottom: 10px; width: 50px; height: 50px; background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; color: white;">
+                <i class="fa-solid fa-play"></i>
+            </div>
             <div class="logo-text">
-                <h1>ANIME <span class="purple-text">MAX</span> ZONE</h1>
-                <p>Admin Panel</p>
+                <h1 style="font-size: 18px; font-weight: 700; margin: 0;">ANIME <span style="color: #a855f7;">MAX</span> ZONE</h1>
+                <p style="font-size: 12px; color: #888; margin-top: 5px;">Admin Panel</p>
             </div>
         </div>
 
         <h2>Welcome Back</h2>
         <p class="subtitle">Login to manage your content</p>
 
+        <!-- Email Input -->
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="adminEmail" placeholder="Email Address">
+            <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email">
         </div>
 
+        <!-- Password Input -->
         <div class="input-group">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" id="adminPassword" placeholder="Password">
+            <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password">
         </div>
 
+        <!-- Login Button -->
         <button id="loginBtn" class="admin-btn">Login</button>
         
         <div class="divider">
             <span>OR</span>
         </div>
 
+        <!-- Google Login Button -->
         <button id="googleLoginBtn" class="admin-btn google-btn">
             <i class="fa-brands fa-google" style="color: #DB4437; font-size: 18px;"></i>
             Continue with Google
         </button>
 
+        <!-- Error Message Display Area -->
         <p id="loginError" class="error-msg"></p>
     </div>
 
+    <!-- Admin JS File (Login Logic yahan se aayega) -->
     <script src="admin.js"></script>
 </body>
 </html>
