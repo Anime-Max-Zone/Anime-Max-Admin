@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Login - Anime Max Zone</title>
     
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Firebase SDKs -->
+    <!-- 🔥 FIREBASE SDKs (Database script add kar diya gaya hai) 🔥 -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body">
@@ -34,13 +39,13 @@
         <!-- Email Input -->
         <div class="input-group">
             <i class="fa-solid fa-envelope"></i>
-            <input type="email" id="adminEmail" placeholder="Email Address" required>
+            <input type="email" id="adminEmail" placeholder="Email Address" autocomplete="email" required>
         </div>
 
         <!-- Password Input -->
         <div class="input-group">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" id="adminPassword" placeholder="Password" required>
+            <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password" required>
         </div>
 
         <!-- Login Button -->
@@ -56,13 +61,11 @@
             Continue with Google
         </button>
 
-        <!-- Error Message Display -->
+        <!-- Error Message Display Area -->
         <p id="loginError" class="error-msg"></p>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
-
+    <!-- Admin JS File (Login Logic) -->
     <script src="admin.js"></script>
 </body>
 </html>
