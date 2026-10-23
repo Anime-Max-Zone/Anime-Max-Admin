@@ -32,9 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Auth State Check
+    // Auth State Check (Page Protection)
     auth.onAuthStateChanged((user) => {
         const path = window.location.href;
+        
         if (user && path.includes('admin-login.html')) {
             window.location.href = 'admin-dashboard.html';
         }
@@ -49,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
 
+    // Email/Password Login
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -73,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Google Login
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -92,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Check Google Redirect Result
     auth.getRedirectResult().then((result) => {
         if (result.user && window.location.href.includes('admin-login.html')) {
             window.location.href = 'admin-dashboard.html'; 
@@ -176,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ================= 6. UPLOAD PAGE LOGIC (Updated for Audio, Quality, Subtitle) =================
+    // ================= 6. UPLOAD PAGE LOGIC =================
     const uploadTitleSelect = document.getElementById('uploadTitleSelect');
     if (uploadTitleSelect) {
         // Populate Dropdown
@@ -189,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Show/Hide Fields
+        // Show/Hide Fields based on type
         uploadTitleSelect.addEventListener('change', (e) => {
             const selectedKey = e.target.value;
             const movieFields = document.getElementById('uploadMovieFields');
@@ -197,15 +201,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const submitBtn = document.getElementById('uploadSubmitBtn');
 
             if(!selectedKey) {
-                movieFields.style.display = 'none'; animeFields.style.display = 'none'; submitBtn.style.display = 'none';
+                movieFields.style.display = 'none'; 
+                animeFields.style.display = 'none'; 
+                submitBtn.style.display = 'none';
                 return;
             }
             submitBtn.style.display = 'flex';
             const item = globalContentData[selectedKey];
 
             if (item.type === 'movie') {
-                movieFields.style.display = 'block'; animeFields.style.display = 'none';
-                // Optional: Pre-fill if existing data
+                movieFields.style.display = 'block'; 
+                animeFields.style.display = 'none';
+                
+                // Pre-fill existing movie data if any
                 if(item.qualities) {
                     document.getElementById('movieVideo480').value = item.qualities['480p'] || '';
                     document.getElementById('movieVideo720').value = item.qualities['720p'] || '';
@@ -214,7 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('movieAudio').value = item.audio || 'Hindi';
                 document.getElementById('movieSubtitle').value = item.subtitle || '';
             } else {
-                movieFields.style.display = 'none'; animeFields.style.display = 'block';
+                movieFields.style.display = 'none'; 
+                animeFields.style.display = 'block';
             }
         });
 
