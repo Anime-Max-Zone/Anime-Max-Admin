@@ -3,189 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Admin Dashboard - Anime Max Zone</title>
-    
+    <title>Dashboard - Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
-    <!-- Header -->
     <header class="admin-header">
-        <div class="logo-text">
-            <h1>Admin Dashboard</h1>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <a href="https://anime-max-zone.github.io/Anime-Max-Zone/index.html" target="_blank" class="logout-btn" style="border-color: #22c55e; color: #22c55e; text-decoration: none;">
-                <i class="fa-solid fa-globe"></i> Website
-            </a>
-            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i> Logout</button>
+        <div class="logo-text"><h1>Admin Dashboard</h1></div>
+        <div style="display: flex; gap: 10px;">
+            <a href="https://anime-max-zone.github.io/Anime-Max-Zone/index.html" target="_blank" class="logout-btn" style="border-color: #22c55e; color: #22c55e; text-decoration: none;"><i class="fa-solid fa-globe"></i> App</a>
+            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </header>
 
-    <!-- Tab Navigation -->
-    <div class="admin-tabs">
-        <button class="tab-btn active" onclick="switchTab('dashboardView')"><i class="fa-solid fa-list"></i> Dashboard</button>
-        <button class="tab-btn" onclick="switchTab('addTitleView')"><i class="fa-solid fa-plus"></i> Add Title</button>
-        <button class="tab-btn" onclick="switchTab('uploadView')"><i class="fa-solid fa-upload"></i> Upload</button>
-    </div>
-
     <main class="admin-main">
+        <h2 class="view-title">All Content</h2>
         
-        <!-- ================= VIEW 1: DASHBOARD LIST ================= -->
-        <div id="dashboardView" class="admin-view active">
-            <h2 class="view-title">All Content</h2>
-            
-            <h3 style="color: #a855f7; margin-bottom: 10px; font-size: 16px;">Anime Series</h3>
-            <div id="animeListContainer" class="admin-list">
-                <!-- Anime items will be injected here -->
-                <p class="loading-text">Loading Anime...</p>
-            </div>
-
-            <h3 style="color: #a855f7; margin-top: 30px; margin-bottom: 10px; font-size: 16px;">Movies</h3>
-            <div id="movieListContainer" class="admin-list">
-                <!-- Movie items will be injected here -->
-                <p class="loading-text">Loading Movies...</p>
-            </div>
+        <h3 class="section-title" style="color: #a855f7; margin-bottom: 15px; font-size: 16px;">Anime Series</h3>
+        <div id="animeListContainer" class="admin-list">
+            <p class="loading-text">Loading Anime...</p>
         </div>
 
-        <!-- ================= VIEW 2: ADD TITLE ================= -->
-        <div id="addTitleView" class="admin-view">
-            <h2 class="view-title">Add New Title</h2>
-            <form id="addTitleForm" class="form-container">
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Content Type</label>
-                        <select id="addType" class="admin-input">
-                            <option value="anime">Anime Series</option>
-                            <option value="movie">Movie</option>
-                        </select>
-                    </div>
-                    <div class="input-group">
-                        <label>Title</label>
-                        <input type="text" id="addTitle" class="admin-input" placeholder="e.g. Solo Leveling" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Poster Image URL</label>
-                        <input type="url" id="addImage" class="admin-input" placeholder="https://..." required>
-                    </div>
-                    <div class="input-group">
-                        <label>Banner Image URL (Optional)</label>
-                        <input type="url" id="addBanner" class="admin-input" placeholder="https://...">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Rating (0-10)</label>
-                        <input type="number" id="addRating" class="admin-input" step="0.1" placeholder="8.5">
-                    </div>
-                    <div class="input-group">
-                        <label>Year</label>
-                        <input type="text" id="addYear" class="admin-input" placeholder="2024">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Genres (Comma separated)</label>
-                        <input type="text" id="addGenres" class="admin-input" placeholder="Action, Fantasy">
-                    </div>
-                </div>
-                <div class="input-group full-width">
-                    <label>Synopsis / Description</label>
-                    <textarea id="addSynopsis" class="admin-input" rows="3" placeholder="Enter story..."></textarea>
-                </div>
-                <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-save"></i> Save Title</button>
-                <p id="addStatus" class="success-msg"></p>
-            </form>
+        <h3 class="section-title" style="color: #a855f7; margin-top: 30px; margin-bottom: 15px; font-size: 16px;">Movies</h3>
+        <div id="movieListContainer" class="admin-list">
+            <p class="loading-text">Loading Movies...</p>
         </div>
-
-        <!-- ================= VIEW 3: UPLOAD EPISODES/VIDEO ================= -->
-        <div id="uploadView" class="admin-view">
-            <h2 class="view-title">Upload Video / Episodes</h2>
-            <form id="uploadForm" class="form-container">
-                <div class="input-group full-width" style="margin-bottom: 20px;">
-                    <label>Select Anime or Movie</label>
-                    <select id="uploadTitleSelect" class="admin-input" required>
-                        <option value="">-- Loading Content... --</option>
-                    </select>
-                </div>
-
-                <!-- Movie Upload Fields -->
-                <div id="uploadMovieFields" style="display: none;">
-                    <div class="input-group full-width">
-                        <label>Google Drive Video ID / URL</label>
-                        <input type="text" id="movieVideoId" class="admin-input" placeholder="Enter GDrive ID">
-                    </div>
-                </div>
-
-                <!-- Anime Upload Fields -->
-                <div id="uploadAnimeFields" style="display: none;">
-                    <div class="input-group full-width" style="margin-bottom: 15px;">
-                        <label>Season Name</label>
-                        <input type="text" id="uploadSeasonName" class="admin-input" value="Season 1">
-                    </div>
-                    <div class="season-box">
-                        <h4>Add New Episode</h4>
-                        <div class="ep-row">
-                            <input type="number" id="newEpNumber" class="admin-input" placeholder="Ep No." style="width: 80px;">
-                            <input type="text" id="newEpTitle" class="admin-input" placeholder="Episode Title">
-                            <input type="text" id="newEpVideoId" class="admin-input" placeholder="GDrive ID / Link">
-                        </div>
-                    </div>
-                </div>
-
-                <button type="submit" class="admin-btn submit-btn" id="uploadSubmitBtn" style="display: none;"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Content</button>
-                <p id="uploadStatus" class="success-msg"></p>
-            </form>
-        </div>
-
-        <!-- ================= VIEW 4: EDIT ================= -->
-        <div id="editView" class="admin-view">
-            <h2 class="view-title">Edit Content</h2>
-            <form id="editForm" class="form-container">
-                <input type="hidden" id="editId">
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Title</label>
-                        <input type="text" id="editTitle" class="admin-input" required>
-                    </div>
-                    <div class="input-group">
-                        <label>Poster Image URL</label>
-                        <input type="url" id="editImage" class="admin-input" required>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="input-group">
-                        <label>Rating</label>
-                        <input type="number" id="editRating" class="admin-input" step="0.1">
-                    </div>
-                    <div class="input-group">
-                        <label>Year</label>
-                        <input type="text" id="editYear" class="admin-input">
-                    </div>
-                </div>
-                <div class="input-group full-width">
-                    <label>Synopsis</label>
-                    <textarea id="editSynopsis" class="admin-input" rows="3"></textarea>
-                </div>
-                
-                <div style="display: flex; gap: 10px;">
-                    <button type="submit" class="admin-btn" style="flex: 1;"><i class="fa-solid fa-check"></i> Update Info</button>
-                    <button type="button" class="admin-btn" style="flex: 1; background: #333;" onclick="switchTab('dashboardView')">Cancel</button>
-                </div>
-                <p id="editStatus" class="success-msg"></p>
-            </form>
-        </div>
-
     </main>
+
+    <!-- Admin Bottom Nav -->
+    <nav class="admin-bottom-nav">
+        <a href="admin-dashboard.html" class="admin-nav-item active"><i class="fa-solid fa-list"></i><span>Dashboard</span></a>
+        <a href="admin-add-title.html" class="admin-nav-item"><i class="fa-solid fa-plus"></i><span>Add Title</span></a>
+        <a href="admin-upload.html" class="admin-nav-item"><i class="fa-solid fa-upload"></i><span>Upload</span></a>
+    </nav>
 
     <script src="admin.js"></script>
 </body>
