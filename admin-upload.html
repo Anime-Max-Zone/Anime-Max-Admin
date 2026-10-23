@@ -42,7 +42,12 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
                         <div id="movieQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="movieQaLabel" class="admin-input" placeholder="Label (e.g. 720p)" style="width: 110px;">
+                            <select id="movieQaLabel" class="admin-input" style="width: 110px;">
+                                <option value="480p">480p</option>
+                                <option value="720p">720p</option>
+                                <option value="1080p">1080p</option>
+                                <option value="4K">4K</option>
+                            </select>
                             <input type="text" id="movieQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieQualityContainer', 'movieQaLabel', 'movieQaUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
@@ -53,7 +58,13 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
                         <div id="movieAudioContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="movieAuLabel" class="admin-input" placeholder="Language (e.g. Hindi)" style="width: 110px;">
+                            <select id="movieAuLabel" class="admin-input" style="width: 110px;">
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Tamil">Tamil</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Japanese">Japanese</option>
+                            </select>
                             <input type="text" id="movieAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieAudioContainer', 'movieAuLabel', 'movieAuUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
@@ -64,7 +75,11 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
                         <div id="movieSubtitleContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="movieSubLabel" class="admin-input" placeholder="Language (e.g. English)" style="width: 110px;">
+                            <select id="movieSubLabel" class="admin-input" style="width: 110px;">
+                                <option value="English">English</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="None">None</option>
+                            </select>
                             <input type="text" id="movieSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieSubtitleContainer', 'movieSubLabel', 'movieSubUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
@@ -98,7 +113,12 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
                         <div id="animeQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="animeQaLabel" class="admin-input" placeholder="Label (e.g. 720p)" style="width: 110px;">
+                            <select id="animeQaLabel" class="admin-input" style="width: 110px;">
+                                <option value="480p">480p</option>
+                                <option value="720p">720p</option>
+                                <option value="1080p">1080p</option>
+                                <option value="4K">4K</option>
+                            </select>
                             <input type="text" id="animeQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeQualityContainer', 'animeQaLabel', 'animeQaUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
@@ -109,7 +129,13 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
                         <div id="animeAudioContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="animeAuLabel" class="admin-input" placeholder="Language (e.g. Hindi)" style="width: 110px;">
+                            <select id="animeAuLabel" class="admin-input" style="width: 110px;">
+                                <option value="Hindi">Hindi</option>
+                                <option value="English">English</option>
+                                <option value="Tamil">Tamil</option>
+                                <option value="Telugu">Telugu</option>
+                                <option value="Japanese">Japanese</option>
+                            </select>
                             <input type="text" id="animeAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeAudioContainer', 'animeAuLabel', 'animeAuUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
@@ -120,7 +146,11 @@
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
                         <div id="animeSubtitleContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <input type="text" id="animeSubLabel" class="admin-input" placeholder="Language (e.g. English)" style="width: 110px;">
+                            <select id="animeSubLabel" class="admin-input" style="width: 110px;">
+                                <option value="English">English</option>
+                                <option value="Hindi">Hindi</option>
+                                <option value="None">None</option>
+                            </select>
                             <input type="text" id="animeSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeSubtitleContainer', 'animeSubLabel', 'animeSubUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
