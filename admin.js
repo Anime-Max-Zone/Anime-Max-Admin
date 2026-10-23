@@ -25,17 +25,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => { window.location.href = 'admin-login.html'; });
+            // Logout hone par index.html par bhejein
+            auth.signOut().then(() => { window.location.href = 'index.html'; });
         });
     }
 
     auth.onAuthStateChanged((user) => {
         const path = window.location.href;
-        if (user && path.includes('admin-login.html')) {
+        // Check karein ki user Login page par hai ya nahi (chahe URL / ho ya /index.html)
+        const isLoginPage = path.endsWith('/') || path.includes('index.html');
+        
+        // Agar logged in hai aur login page par hai, toh Dashboard bhejo
+        if (user && isLoginPage) {
             window.location.href = 'admin-dashboard.html';
         }
-        if (!user && !path.includes('admin-login.html')) {
-            window.location.href = 'admin-login.html';
+        
+        // Agar logged out hai aur kisi protected page par hai, toh Login (index.html) bhejo
+        if (!user && !isLoginPage) {
+            window.location.href = 'index.html';
         }
     });
 
@@ -81,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     auth.getRedirectResult().then((result) => {
-        if (result.user && window.location.href.includes('admin-login.html')) {
+        const path = window.location.href;
+        const isLoginPage = path.endsWith('/') || path.includes('index.html');
+        if (result.user && isLoginPage) {
             window.location.href = 'admin-dashboard.html'; 
         }
     });
@@ -102,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
                 
-                // 🔥 FIX: Anime click par Series Page khulega, Movie click par Movie Edit Page
+                // Anime click par Series Page khulega, Movie click par Movie Edit Page
                 const targetUrl = item.type === 'movie' ? `admin-movie-edit.html?id=${key}` : `admin-series.html?id=${key}`;
                 
                 const listHTML = `
