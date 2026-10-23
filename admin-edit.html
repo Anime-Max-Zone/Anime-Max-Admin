@@ -90,10 +90,15 @@
                 
                 <!-- Quality Section -->
                 <div style="margin-bottom: 15px;">
-                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Video Qualities</label>
+                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
                     <div id="editQualityContainer"></div>
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <input type="text" id="editQaLabel" class="admin-input" placeholder="Label (e.g. 720p)" style="width: 110px;">
+                        <select id="editQaLabel" class="admin-input" style="width: 110px;">
+                            <option value="480p">480p</option>
+                            <option value="720p">720p</option>
+                            <option value="1080p">1080p</option>
+                            <option value="4K">4K</option>
+                        </select>
                         <input type="text" id="editQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editQualityContainer', 'editQaLabel', 'editQaUrl')"><i class="fa-solid fa-plus"></i></button>
                     </div>
@@ -101,10 +106,16 @@
 
                 <!-- Audio Section -->
                 <div style="margin-bottom: 15px;">
-                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Audio Tracks</label>
+                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
                     <div id="editAudioContainer"></div>
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <input type="text" id="editAuLabel" class="admin-input" placeholder="Language (e.g. Hindi)" style="width: 110px;">
+                        <select id="editAuLabel" class="admin-input" style="width: 110px;">
+                            <option value="Hindi">Hindi</option>
+                            <option value="English">English</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Telugu">Telugu</option>
+                            <option value="Japanese">Japanese</option>
+                        </select>
                         <input type="text" id="editAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editAudioContainer', 'editAuLabel', 'editAuUrl')"><i class="fa-solid fa-plus"></i></button>
                     </div>
@@ -112,10 +123,14 @@
 
                 <!-- Subtitle Section -->
                 <div>
-                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
+                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
                     <div id="editSubtitleContainer"></div>
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <input type="text" id="editSubLabel" class="admin-input" placeholder="Language (e.g. English)" style="width: 110px;">
+                        <select id="editSubLabel" class="admin-input" style="width: 110px;">
+                            <option value="English">English</option>
+                            <option value="Hindi">Hindi</option>
+                            <option value="None">None</option>
+                        </select>
                         <input type="text" id="editSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editSubtitleContainer', 'editSubLabel', 'editSubUrl')"><i class="fa-solid fa-plus"></i></button>
                     </div>
