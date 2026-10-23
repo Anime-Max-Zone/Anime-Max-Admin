@@ -15,7 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     
-    <!-- Admin CSS File (UI Fix yahan se aayega) -->
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body">
@@ -47,15 +47,15 @@
             <input type="password" id="adminPassword" placeholder="Password" autocomplete="current-password">
         </div>
 
-        <!-- Login Button -->
-        <button id="loginBtn" class="admin-btn">Login</button>
+        <!-- Login Button (type="button" lagaya hai taaki page refresh na ho) -->
+        <button type="button" id="loginBtn" class="admin-btn">Login</button>
         
         <div class="divider">
             <span>OR</span>
         </div>
 
         <!-- Google Login Button -->
-        <button id="googleLoginBtn" class="admin-btn google-btn">
+        <button type="button" id="googleLoginBtn" class="admin-btn google-btn">
             <i class="fa-brands fa-google" style="color: #DB4437; font-size: 18px;"></i>
             Continue with Google
         </button>
@@ -64,7 +64,7 @@
         <p id="loginError" class="error-msg"></p>
     </div>
 
-    <!-- Admin JS File (Login Logic yahan se aayega) -->
+    <!-- Admin JS File (Login Logic) -->
     <script src="admin.js"></script>
 </body>
 </html>
