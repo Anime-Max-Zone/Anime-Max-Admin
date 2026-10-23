@@ -5,15 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Edit Episode - Admin</title>
     
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
         <a href="javascript:history.back()" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none; padding: 8px 12px;">
             <i class="fa-solid fa-arrow-left"></i> Back
@@ -22,9 +30,11 @@
         <div style="width: 70px;"></div>
     </header>
 
+    <!-- Main Content -->
     <main class="admin-main">
         <form id="episodeEditForm" class="form-container">
             
+            <!-- Episode Info -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Episode No.</label>
@@ -69,7 +79,7 @@
                 </div>
             </div>
 
-            <!--- 3. SUBTITLE SECTION --->
+            <!-- 3. SUBTITLE SECTION -->
             <div>
                 <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
                 <div id="epSubtitleContainer"></div>
@@ -84,11 +94,13 @@
                 </div>
             </div>
             
+            <!-- Submit Button -->
             <button type="submit" class="admin-btn submit-btn" style="margin-top: 25px;"><i class="fa-solid fa-check"></i> Update Episode</button>
             <p id="epEditStatus" class="success-msg"></p>
         </form>
     </main>
 
+    <!-- Admin JS File -->
     <script src="admin.js"></script>
 </body>
 </html>
