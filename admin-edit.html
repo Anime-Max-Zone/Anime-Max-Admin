@@ -36,7 +36,7 @@
             <!-- Hidden ID -->
             <input type="hidden" id="editId">
             
-            <!-- Title & Type (Read Only Type) -->
+            <!-- Title & Type -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Title</label>
@@ -83,9 +83,47 @@
                 <label>Synopsis / Description</label>
                 <textarea id="editSynopsis" class="admin-input" rows="4"></textarea>
             </div>
+
+            <!-- ================= MOVIE LINKS SECTION (Only shows for Movies) ================= -->
+            <div id="editLinksSection" style="display: none; margin-top: 20px; border-top: 1px solid #1a1a24; padding-top: 20px;">
+                <h3 style="color: #a855f7; font-size: 16px; margin-bottom: 15px;">Movie Links (Quality / Audio / Subtitle)</h3>
+                
+                <!-- Quality Section -->
+                <div style="margin-bottom: 15px;">
+                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Video Qualities</label>
+                    <div id="editQualityContainer"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="text" id="editQaLabel" class="admin-input" placeholder="Label (e.g. 720p)" style="width: 110px;">
+                        <input type="text" id="editQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
+                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editQualityContainer', 'editQaLabel', 'editQaUrl')"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <!-- Audio Section -->
+                <div style="margin-bottom: 15px;">
+                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Audio Tracks</label>
+                    <div id="editAudioContainer"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="text" id="editAuLabel" class="admin-input" placeholder="Language (e.g. Hindi)" style="width: 110px;">
+                        <input type="text" id="editAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
+                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editAudioContainer', 'editAuLabel', 'editAuUrl')"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+
+                <!-- Subtitle Section -->
+                <div>
+                    <label style="color:#aaa; font-size:12px; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
+                    <div id="editSubtitleContainer"></div>
+                    <div style="display: flex; gap: 10px; margin-top: 5px;">
+                        <input type="text" id="editSubLabel" class="admin-input" placeholder="Language (e.g. English)" style="width: 110px;">
+                        <input type="text" id="editSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
+                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editSubtitleContainer', 'editSubLabel', 'editSubUrl')"><i class="fa-solid fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
             
             <!-- Update Button -->
-            <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-check"></i> Update Info</button>
+            <button type="submit" class="admin-btn submit-btn" style="margin-top: 25px;"><i class="fa-solid fa-check"></i> Update All Info</button>
             <p id="editStatus" class="success-msg"></p>
         </form>
 
