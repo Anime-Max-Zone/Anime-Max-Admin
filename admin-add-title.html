@@ -4,21 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Add Title - Admin</title>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
+        <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none; padding: 8px 12px;">
+            <i class="fa-solid fa-arrow-left"></i> Back
+        </a>
         <div class="logo-text"><h1>Add New Title</h1></div>
+        <div style="width: 70px;"></div> <!-- Flexbox balance ke liye -->
     </header>
 
+    <!-- Main Content -->
     <main class="admin-main">
         <form id="addTitleForm" class="form-container">
+            
             <div class="form-row">
                 <div class="input-group">
                     <label>Content Type</label>
@@ -32,6 +47,7 @@
                     <input type="text" id="addTitle" class="admin-input" placeholder="e.g. Solo Leveling" required>
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="input-group">
                     <label>Poster Image URL</label>
@@ -42,6 +58,7 @@
                     <input type="url" id="addBanner" class="admin-input" placeholder="https://...">
                 </div>
             </div>
+
             <div class="form-row">
                 <div class="input-group">
                     <label>Rating (0-10)</label>
@@ -52,26 +69,41 @@
                     <input type="text" id="addYear" class="admin-input" placeholder="2024">
                 </div>
             </div>
+
             <div class="input-group full-width">
                 <label>Genres (Comma separated)</label>
                 <input type="text" id="addGenres" class="admin-input" placeholder="Action, Fantasy">
             </div>
+
             <div class="input-group full-width">
                 <label>Synopsis / Description</label>
-                <textarea id="addSynopsis" class="admin-input" rows="3" placeholder="Enter story..."></textarea>
+                <textarea id="addSynopsis" class="admin-input" rows="4" placeholder="Enter story..."></textarea>
             </div>
+
             <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-save"></i> Save Title</button>
+            
+            <!-- Success/Error Message Display -->
             <p id="addStatus" class="success-msg"></p>
         </form>
     </main>
 
-    <!-- Admin Bottom Nav -->
+    <!-- Admin Bottom Navigation -->
     <nav class="admin-bottom-nav">
-        <a href="admin-dashboard.html" class="admin-nav-item"><i class="fa-solid fa-list"></i><span>Dashboard</span></a>
-        <a href="admin-add-title.html" class="admin-nav-item active"><i class="fa-solid fa-plus"></i><span>Add Title</span></a>
-        <a href="admin-upload.html" class="admin-nav-item"><i class="fa-solid fa-upload"></i><span>Upload</span></a>
+        <a href="admin-dashboard.html" class="admin-nav-item">
+            <i class="fa-solid fa-list"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-add-title.html" class="admin-nav-item active">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Title</span>
+        </a>
+        <a href="admin-upload.html" class="admin-nav-item">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload</span>
+        </a>
     </nav>
 
+    <!-- Admin JS File (Form logic & Auth) -->
     <script src="admin.js"></script>
 </body>
 </html>
