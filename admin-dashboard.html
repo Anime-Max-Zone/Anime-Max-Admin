@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Admin Dashboard - Anime Max Zone</title>
+    
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase SDKs -->
@@ -12,22 +16,38 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
         <div class="logo-text">
             <h1>Admin Dashboard</h1>
         </div>
-        <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i> Logout</button>
+        
+        <!-- Buttons Container -->
+        <div style="display: flex; gap: 10px; align-items: center;">
+            <!-- Website par wapas jane ka link -->
+            <a href="https://anime-max-zone.github.io/Anime-Max-Zone/index.html" target="_blank" class="logout-btn" style="border-color: #22c55e; color: #22c55e; text-decoration: none; display: flex; align-items: center; gap: 5px;">
+                <i class="fa-solid fa-globe"></i> Website
+            </a>
+            
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="logout-btn"><i class="fa-solid fa-power-off"></i> Logout</button>
+        </div>
     </header>
 
+    <!-- Main Content Area -->
     <main class="admin-main">
         <div class="form-container">
             <h2>Add New Content</h2>
             
+            <!-- Content Upload Form -->
             <form id="contentForm">
+                
+                <!-- Content Type Dropdown -->
                 <div class="form-row">
                     <div class="input-group">
                         <label>Content Type</label>
@@ -38,6 +58,7 @@
                     </div>
                 </div>
 
+                <!-- Title & Poster -->
                 <div class="form-row">
                     <div class="input-group">
                         <label>Title</label>
@@ -49,6 +70,7 @@
                     </div>
                 </div>
 
+                <!-- Banner & Rating -->
                 <div class="form-row">
                     <div class="input-group">
                         <label>Banner Image URL (Optional)</label>
@@ -60,6 +82,7 @@
                     </div>
                 </div>
 
+                <!-- Year & Genres -->
                 <div class="form-row">
                     <div class="input-group">
                         <label>Year</label>
@@ -71,22 +94,30 @@
                     </div>
                 </div>
 
+                <!-- Synopsis -->
                 <div class="input-group full-width">
                     <label>Synopsis / Description</label>
                     <textarea id="contentSynopsis" class="admin-input" rows="3" placeholder="Enter story..."></textarea>
                 </div>
 
-                <!-- DYNAMIC AREA FOR EPISODES/MOVIES -->
+                <!-- DYNAMIC AREA: JS will inject fields here based on Content Type (Anime = Episodes, Movie = Video ID) -->
                 <div id="dynamicFields">
-                    <!-- JS will inject fields here based on Content Type -->
+                    <!-- Fields will be rendered here -->
                 </div>
 
-                <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Content</button>
+                <!-- Submit Button -->
+                <button type="submit" class="admin-btn submit-btn">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload Content
+                </button>
+                
+                <!-- Status Message (Success/Error) -->
                 <p id="uploadStatus" class="success-msg"></p>
+                
             </form>
         </div>
     </main>
 
+    <!-- Admin JS File (Form logic & Auth) -->
     <script src="admin.js"></script>
 </body>
 </html>
