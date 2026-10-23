@@ -101,7 +101,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             Object.keys(globalContentData).forEach(key => {
                 const item = globalContentData[key];
-                // DASHBOARD ME DELETE BUTTON ADD KIYA GAYA HAI
                 const listHTML = `
                     <div class="list-item">
                         <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75'">
@@ -341,15 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editSynopsis').value = data.synopsis || '';
 
-                // Agar Movie hai, toh Links section dikhayein
-                if(data.type === 'movie') {
-                    document.getElementById('editLinksSection').style.display = 'block';
-                    renderExistingLinks('editQualityContainer', data.qualities);
-                    renderExistingLinks('editAudioContainer', data.audios);
-                    renderExistingLinks('editSubtitleContainer', data.subtitles);
-                } else {
-                    document.getElementById('editLinksSection').style.display = 'none';
-                }
+                // 🔥 FIX: Ab Data hamesha load hoga (Movie ho ya Anime)
+                renderExistingLinks('editQualityContainer', data.qualities);
+                renderExistingLinks('editAudioContainer', data.audios);
+                renderExistingLinks('editSubtitleContainer', data.subtitles);
             }
         });
 
@@ -367,15 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 rating: parseFloat(document.getElementById('editRating').value) || 0,
                 year: document.getElementById('editYear').value.trim(),
                 genres: document.getElementById('editGenres').value.split(',').map(g => g.trim()).filter(g => g),
-                synopsis: document.getElementById('editSynopsis').value.trim()
+                synopsis: document.getElementById('editSynopsis').value.trim(),
+                // 🔥 FIX: Links hamesha save honge
+                qualities: getEditLinksData('editQualityContainer'),
+                audios: getEditLinksData('editAudioContainer'),
+                subtitles: getEditLinksData('editSubtitleContainer')
             };
-
-            // Agar Movie hai, toh naye links bhi save karein
-            if(document.getElementById('editType').value === 'Movie') {
-                updatedData.qualities = getEditLinksData('editQualityContainer');
-                updatedData.audios = getEditLinksData('editAudioContainer');
-                updatedData.subtitles = getEditLinksData('editSubtitleContainer');
-            }
 
             db.ref('content/' + id).update(updatedData).then(() => {
                 status.innerText = "Updated Successfully! Redirecting..."; status.style.color = "#22c55e";
