@@ -17,32 +17,46 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.database();
 
-// ================= 2. AUTHENTICATION LOGIC =================
+let globalContentData = {}; // Data store for Upload & Dashboard pages
+
+// ================= 2. GLOBAL AUTHENTICATION & PAGE PROTECTION =================
 document.addEventListener('DOMContentLoaded', () => {
     
+    // Logout Button Logic (Header me har page par hai)
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'admin-login.html';
+            });
+        });
+    }
+
+    // Auth State Check (Page Protection)
+    auth.onAuthStateChanged((user) => {
+        const path = window.location.href;
+        
+        // Agar login page par hain aur user logged in hai, toh dashboard bhejo
+        if (user && path.includes('admin-login.html')) {
+            window.location.href = 'admin-dashboard.html';
+        }
+        
+        // Agar kisi admin page par hain aur logged in nahi hai, toh login bhejo
+        if (!user && !path.includes('admin-login.html')) {
+            window.location.href = 'admin-login.html';
+        }
+    });
+
+
+    // ================= 3. LOGIN PAGE LOGIC =================
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
     const loginError = document.getElementById('loginError');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    // ================= GOOGLE REDIRECT RESULT CHECK =================
-    // Ye check karega ki agar user redirect hokar wapas aaya hai (Agar popup block hua tha)
-    auth.getRedirectResult().then((result) => {
-        if (result.user) {
-            window.location.href = 'admin-dashboard.html'; 
-        }
-    }).catch((error) => {
-        if (loginError) {
-            loginError.innerText = "Google Auth Error: " + error.message;
-            loginError.style.color = "#ff4d4d";
-        }
-    });
 
     // Email/Password Login
     if (loginBtn) {
         loginBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Page refresh rokne ke liye
-
+            e.preventDefault();
             const email = document.getElementById('adminEmail').value.trim();
             const password = document.getElementById('adminPassword').value;
             
@@ -52,177 +66,231 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            loginError.innerText = "Logging in... Please wait.";
+            loginError.innerText = "Logging in...";
             loginError.style.color = "#a855f7";
 
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    alert("Login Successful!");
+                .then(() => {
                     window.location.href = 'admin-dashboard.html'; 
                 })
                 .catch((error) => {
-                    console.error("Login Error:", error);
-                    if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                        loginError.innerText = "Invalid Email or Password!";
-                    } else if (error.code === 'auth/network-request-failed') {
-                        loginError.innerText = "Network Error! Check your internet.";
-                    } else {
-                        loginError.innerText = error.message;
-                    }
+                    loginError.innerText = "Invalid Email or Password!";
                     loginError.style.color = "#ff4d4d";
                 });
         });
     }
 
-    // Google Login (Fixed for Mobile)
+    // Google Login
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const provider = new firebase.auth.GoogleAuthProvider();
+            loginError.innerText = "Opening Google...";
             
-            loginError.innerText = "Opening Google Login...";
-            loginError.style.color = "#a855f7";
-
-            // Sabse pehle Popup try karenge (Mobile me zyada reliable hai)
             auth.signInWithPopup(provider)
-                .then((result) => {
-                    alert("Google Login Successful!");
+                .then(() => {
                     window.location.href = 'admin-dashboard.html';
                 })
                 .catch((error) => {
-                    console.error("Google Popup Error:", error);
-                    // Agar popup block ho jaye, toh Redirect try karo
-                    if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-                        loginError.innerText = "Popup blocked. Redirecting...";
+                    if (error.code === 'auth/popup-blocked') {
                         auth.signInWithRedirect(provider);
                     } else {
-                        loginError.innerText = "Google Error: " + error.message;
+                        loginError.innerText = "Error: " + error.message;
                         loginError.style.color = "#ff4d4d";
                     }
                 });
         });
     }
 
-    // Auth State Change (Dashboard Protect karega)
-    auth.onAuthStateChanged((user) => {
-        const path = window.location.href;
-        if (user && path.includes('admin-login.html')) {
-            window.location.href = 'admin-dashboard.html';
+    // Check Google Redirect Result
+    auth.getRedirectResult().then((result) => {
+        if (result.user && window.location.href.includes('admin-login.html')) {
+            window.location.href = 'admin-dashboard.html'; 
         }
     });
 
-    // ================= 3. DASHBOARD LOGIC =================
-    const contentType = document.getElementById('contentType');
-    const dynamicFields = document.getElementById('dynamicFields');
-    const contentForm = document.getElementById('contentForm');
-    const uploadStatus = document.getElementById('uploadStatus');
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            auth.signOut().then(() => {
-                window.location.href = 'admin-login.html';
+    // ================= 4. DASHBOARD PAGE LOGIC =================
+    const animeListContainer = document.getElementById('animeListContainer');
+    const movieListContainer = document.getElementById('movieListContainer');
+
+    if (animeListContainer && movieListContainer) {
+        // Real-time data fetch for Dashboard
+        db.ref('content').on('value', (snapshot) => {
+            globalContentData = snapshot.val() || {};
+            animeListContainer.innerHTML = '';
+            movieListContainer.innerHTML = '';
+            let hasAnime = false, hasMovies = false;
+
+            Object.keys(globalContentData).forEach(key => {
+                const item = globalContentData[key];
+                const listHTML = `
+                    <div class="list-item">
+                        <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/50x75'">
+                        <div class="list-item-info">
+                            <h4>${item.title}</h4>
+                            <p>${item.type === 'movie' ? 'Movie' : 'Anime'} | ${item.year || 'N/A'}</p>
+                        </div>
+                        <button class="edit-btn" onclick="window.location.href='admin-edit.html?id=${key}'"><i class="fa-solid fa-pen"></i> Edit</button>
+                    </div>
+                `;
+                if (item.type === 'movie') { movieListContainer.innerHTML += listHTML; hasMovies = true; }
+                else { animeListContainer.innerHTML += listHTML; hasAnime = true; }
+            });
+
+            if(!hasAnime) animeListContainer.innerHTML = '<p class="loading-text">No Anime added yet.</p>';
+            if(!hasMovies) movieListContainer.innerHTML = '<p class="loading-text">No Movies added yet.</p>';
+        });
+    }
+
+
+    // ================= 5. ADD TITLE PAGE LOGIC =================
+    const addTitleForm = document.getElementById('addTitleForm');
+    if (addTitleForm) {
+        addTitleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const status = document.getElementById('addStatus');
+            status.innerText = "Saving..."; status.style.color = "#a855f7";
+
+            const type = document.getElementById('addType').value;
+            const newData = {
+                title: document.getElementById('addTitle').value.trim(),
+                type: type,
+                image: document.getElementById('addImage').value.trim(),
+                banner: document.getElementById('addBanner').value.trim() || document.getElementById('addImage').value.trim(),
+                rating: parseFloat(document.getElementById('addRating').value) || 0,
+                year: document.getElementById('addYear').value.trim() || new Date().getFullYear().toString(),
+                genres: document.getElementById('addGenres').value.split(',').map(g => g.trim()).filter(g => g),
+                synopsis: document.getElementById('addSynopsis').value.trim(),
+                seasons: {}, // Empty init
+                gdrive_id: "" // Empty init
+            };
+
+            db.ref('content').push(newData).then(() => {
+                status.innerText = "Title Added Successfully! Redirecting...";
+                status.style.color = "#22c55e";
+                setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
+            }).catch(err => { 
+                status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; 
             });
         });
     }
 
-    if (contentType) {
-        contentType.addEventListener('change', () => {
-            if (contentType.value === 'movie') {
-                dynamicFields.innerHTML = `
-                    <div class="input-group full-width">
-                        <label>Google Drive Video ID / URL</label>
-                        <input type="text" id="movieVideoId" class="admin-input" placeholder="Enter GDrive ID or Link" required>
-                    </div>
-                `;
+
+    // ================= 6. UPLOAD PAGE LOGIC =================
+    const uploadTitleSelect = document.getElementById('uploadTitleSelect');
+    if (uploadTitleSelect) {
+        // Populate Dropdown
+        db.ref('content').on('value', (snapshot) => {
+            globalContentData = snapshot.val() || {};
+            uploadTitleSelect.innerHTML = '<option value="">-- Select Content --</option>';
+            Object.keys(globalContentData).forEach(key => {
+                const item = globalContentData[key];
+                uploadTitleSelect.innerHTML += `<option value="${key}">${item.title} (${item.type})</option>`;
+            });
+        });
+
+        // Change Event to Show/Hide Fields
+        uploadTitleSelect.addEventListener('change', (e) => {
+            const selectedKey = e.target.value;
+            const movieFields = document.getElementById('uploadMovieFields');
+            const animeFields = document.getElementById('uploadAnimeFields');
+            const submitBtn = document.getElementById('uploadSubmitBtn');
+
+            if(!selectedKey) {
+                movieFields.style.display = 'none'; animeFields.style.display = 'none'; submitBtn.style.display = 'none';
+                return;
+            }
+            submitBtn.style.display = 'flex';
+            const item = globalContentData[selectedKey];
+
+            if (item.type === 'movie') {
+                movieFields.style.display = 'block'; animeFields.style.display = 'none';
+                document.getElementById('movieVideoId').value = item.gdrive_id || '';
             } else {
-                dynamicFields.innerHTML = `
-                    <div class="season-box">
-                        <h4>Season 1 Episodes</h4>
-                        <div id="episodesContainer">
-                            <div class="ep-row">
-                                <input type="number" class="admin-input" placeholder="Ep No." style="width: 80px;" value="1">
-                                <input type="text" class="admin-input" placeholder="Episode Title" required>
-                                <input type="text" class="admin-input" placeholder="GDrive ID / Link" required>
-                            </div>
-                        </div>
-                        <button type="button" class="add-ep-btn" id="addEpBtn">+ Add Another Episode</button>
-                    </div>
-                `;
-                
-                document.getElementById('addEpBtn').addEventListener('click', () => {
-                    const container = document.getElementById('episodesContainer');
-                    const epCount = container.children.length + 1;
-                    const newRow = document.createElement('div');
-                    newRow.className = 'ep-row';
-                    newRow.innerHTML = `
-                        <input type="number" class="admin-input" placeholder="Ep No." style="width: 80px;" value="${epCount}">
-                        <input type="text" class="admin-input" placeholder="Episode Title" required>
-                        <input type="text" class="admin-input" placeholder="GDrive ID / Link" required>
-                    `;
-                    container.appendChild(newRow);
+                movieFields.style.display = 'none'; animeFields.style.display = 'block';
+            }
+        });
+
+        // Submit Upload
+        document.getElementById('uploadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const selectedKey = uploadTitleSelect.value;
+            const item = globalContentData[selectedKey];
+            const status = document.getElementById('uploadStatus');
+            status.innerText = "Uploading..."; status.style.color = "#a855f7";
+
+            if(item.type === 'movie') {
+                db.ref('content/' + selectedKey + '/gdrive_id').set(document.getElementById('movieVideoId').value.trim())
+                    .then(() => { 
+                        status.innerText = "Movie Video Updated!"; 
+                        status.style.color = "#22c55e";
+                        setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
+                    });
+            } else {
+                const seasonName = document.getElementById('uploadSeasonName').value.trim() || "Season 1";
+                const epNo = document.getElementById('newEpNumber').value;
+                const epTitle = document.getElementById('newEpTitle').value.trim();
+                const epVideoId = document.getElementById('newEpVideoId').value.trim();
+
+                if(!epNo || !epTitle || !epVideoId) {
+                    status.innerText = "Please fill all episode fields!"; status.style.color = "#ff4d4d"; return;
+                }
+                const newEp = { ep: parseInt(epNo), title: epTitle, gdrive_id: epVideoId };
+
+                db.ref(`content/${selectedKey}/seasons/${seasonName}`).push(newEp).then(() => {
+                    status.innerText = `Episode Added Successfully!`;
+                    status.style.color = "#22c55e";
+                    setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
                 });
             }
         });
-        contentType.dispatchEvent(new Event('change'));
     }
 
-    if (contentForm) {
-        contentForm.addEventListener('submit', (e) => {
-            e.preventDefault();
 
-            if (!auth.currentUser) {
-                alert("You must be logged in to add content!");
-                window.location.href = 'admin-login.html';
-                return;
+    // ================= 7. EDIT PAGE LOGIC =================
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('id');
+
+        if(!editId) { window.location.href = 'admin-dashboard.html'; return; }
+
+        // Fetch Data for specific item
+        db.ref('content/' + editId).once('value').then(snapshot => {
+            const data = snapshot.val();
+            if(data) {
+                document.getElementById('editId').value = editId;
+                document.getElementById('editTitle').value = data.title || '';
+                document.getElementById('editImage').value = data.image || '';
+                document.getElementById('editRating').value = data.rating || '';
+                document.getElementById('editYear').value = data.year || '';
+                document.getElementById('editSynopsis').value = data.synopsis || '';
             }
-            
-            uploadStatus.innerText = "Uploading... Please wait.";
-            uploadStatus.style.color = "#a855f7";
+        });
 
-            const type = contentType.value;
-            const title = document.getElementById('contentTitle').value.trim();
-            const image = document.getElementById('contentImage').value.trim();
-            const banner = document.getElementById('contentBanner').value.trim() || image;
-            const rating = parseFloat(document.getElementById('contentRating').value) || 0;
-            const year = parseInt(document.getElementById('contentYear').value) || new Date().getFullYear();
-            const synopsis = document.getElementById('contentSynopsis').value.trim();
-            
-            const genresString = document.getElementById('contentGenres').value;
-            const genres = genresString.split(',').map(g => g.trim()).filter(g => g);
+        // Update Data
+        editForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const status = document.getElementById('editStatus');
+            status.innerText = "Updating..."; status.style.color = "#a855f7";
 
-            let finalData = {
-                title: title, type: type, image: image, banner: banner,
-                rating: rating, year: year, genres: genres, synopsis: synopsis
+            const updatedData = {
+                title: document.getElementById('editTitle').value.trim(),
+                image: document.getElementById('editImage').value.trim(),
+                rating: parseFloat(document.getElementById('editRating').value) || 0,
+                year: document.getElementById('editYear').value.trim(),
+                synopsis: document.getElementById('editSynopsis').value.trim()
             };
 
-            if (type === 'movie') {
-                finalData.gdrive_id = document.getElementById('movieVideoId').value.trim();
-            } else {
-                const epRows = document.querySelectorAll('#episodesContainer .ep-row');
-                let episodesArray = [];
-                epRows.forEach(row => {
-                    const inputs = row.querySelectorAll('input');
-                    episodesArray.push({
-                        ep: parseInt(inputs[0].value),
-                        title: inputs[1].value.trim(),
-                        gdrive_id: inputs[2].value.trim()
-                    });
-                });
-                finalData.seasons = { "Season 1": episodesArray };
-            }
-
-            db.ref('content').push(finalData)
-                .then(() => {
-                    uploadStatus.innerText = "Content Uploaded Successfully!";
-                    uploadStatus.style.color = "#22c55e";
-                    contentForm.reset();
-                    contentType.dispatchEvent(new Event('change')); 
-                    setTimeout(() => { uploadStatus.innerText = ""; }, 3000);
-                })
-                .catch((error) => {
-                    uploadStatus.innerText = "Error: " + error.message;
-                    uploadStatus.style.color = "#ff4d4d";
-                });
+            db.ref('content/' + id).update(updatedData).then(() => {
+                status.innerText = "Updated Successfully! Redirecting...";
+                status.style.color = "#22c55e";
+                setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000);
+            }).catch(err => { 
+                status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; 
+            });
         });
     }
 });
