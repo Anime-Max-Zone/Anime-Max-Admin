@@ -139,7 +139,6 @@
 }
 
 /* ================= DASHBOARD PAGE CSS ================= */
-/* Dashboard me body flex center nahi hona chahiye, isliye specific class use ki hai */
 .admin-body.dashboard-body {
     display: block; /* Normal flow */
     padding: 0;
@@ -183,7 +182,7 @@
     width: 100%;
     max-width: 800px;
     margin: 20px auto;
-    padding: 0 15px 90px 15px; /* Bottom padding add ki hai taaki content nav ke piche na chhupe */
+    padding: 0 15px 90px 15px; /* Bottom padding taaki content nav ke piche na chhupe */
     display: flex;
     flex-direction: column;
 }
@@ -217,7 +216,7 @@
     margin-bottom: 0;
 }
 
-/* Labels Dashboard ke liye */
+/* Labels */
 .input-group label {
     display: block;
     font-size: 12px;
@@ -225,7 +224,7 @@
     margin-bottom: 5px;
 }
 
-/* Dashboard Inputs (No left padding, no icon) */
+/* Dashboard Inputs */
 .admin-input {
     width: 100%;
     background: #1a1a24;
@@ -251,7 +250,7 @@ textarea.admin-input {
     margin-bottom: 15px;
 }
 
-/* Dynamic Episodes Section */
+/* Dynamic Boxes */
 .season-box {
     background: #13131a;
     padding: 15px;
@@ -270,7 +269,7 @@ textarea.admin-input {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
-    flex-wrap: wrap; /* Mobile par inputs niche shift ho jayenge */
+    flex-wrap: wrap;
 }
 
 .ep-row input {
@@ -286,7 +285,7 @@ textarea.admin-input {
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
-    width: 100%; /* Button full width lagega */
+    width: 100%;
     margin-top: 5px;
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
