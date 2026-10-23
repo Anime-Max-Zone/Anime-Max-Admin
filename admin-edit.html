@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Edit Content - Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <link rel="stylesheet" href="admin-style.css">
+</head>
+<body class="admin-body dashboard-body">
+
+    <header class="admin-header">
+        <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none;"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        <div class="logo-text"><h1>Edit Title</h1></div>
+    </header>
+
+    <main class="admin-main">
+        <form id="editForm" class="form-container">
+            <input type="hidden" id="editId">
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Title</label>
+                    <input type="text" id="editTitle" class="admin-input" required>
+                </div>
+                <div class="input-group">
+                    <label>Poster Image URL</label>
+                    <input type="url" id="editImage" class="admin-input" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="input-group">
+                    <label>Rating</label>
+                    <input type="number" id="editRating" class="admin-input" step="0.1">
+                </div>
+                <div class="input-group">
+                    <label>Year</label>
+                    <input type="text" id="editYear" class="admin-input">
+                </div>
+            </div>
+            <div class="input-group full-width">
+                <label>Synopsis</label>
+                <textarea id="editSynopsis" class="admin-input" rows="3"></textarea>
+            </div>
+            
+            <button type="submit" class="admin-btn submit-btn"><i class="fa-solid fa-check"></i> Update Info</button>
+            <p id="editStatus" class="success-msg"></p>
+        </form>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
