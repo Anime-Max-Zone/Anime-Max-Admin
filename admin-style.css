@@ -1,17 +1,28 @@
+/* ================= BASE RESET (Sabse Zaroori) ================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Isse inputs screen se bahar nahi jayenge */
+    font-family: 'Poppins', sans-serif;
+}
+
 /* ================= ADMIN PANEL CSS ================= */
 .admin-body {
     background-color: #09090b;
     color: #fff;
-    font-family: 'Poppins', sans-serif;
     min-height: 100vh;
+    display: flex;              /* Login box ko center karne ke liye */
+    justify-content: center;
+    align-items: center;
+    padding: 15px;              /* Mobile me screen se chipkega nahi */
 }
 
 /* --- LOGIN PAGE --- */
 .login-container {
-    max-width: 400px;
-    margin: 50px auto;
+    width: 100%;                /* Mobile par screen ke hisaab se adjust hoga */
+    max-width: 400px;           /* Desktop par 400px se bada nahi hoga */
     background: #0d0d12;
-    padding: 30px;
+    padding: 30px 25px;
     border-radius: 15px;
     border: 1px solid #1a1a24;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -33,6 +44,7 @@
 .input-group {
     position: relative;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .input-group i {
@@ -47,10 +59,10 @@
     width: 100%;
     background: #1a1a24;
     border: 1px solid #2a2a35;
-    padding: 12px 15px 12px 40px;
+    padding: 14px 15px 14px 45px; /* Left padding icon ke liye */
     border-radius: 8px;
     color: #fff;
-    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
     outline: none;
     transition: 0.3s;
 }
@@ -64,11 +76,10 @@
     background: #a855f7;
     color: white;
     border: none;
-    padding: 12px;
+    padding: 14px;
     border-radius: 8px;
     font-size: 15px;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
     cursor: pointer;
     transition: 0.3s;
     margin-top: 10px;
@@ -85,10 +96,6 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-}
-
-.google-btn img {
-    width: 20px;
 }
 
 .google-btn:hover {
@@ -136,6 +143,7 @@
     padding: 20px;
     background: #0d0d12;
     border-bottom: 1px solid #1a1a24;
+    width: 100%; /* Full width for header */
 }
 
 .admin-header h1 {
@@ -149,7 +157,7 @@
     padding: 8px 15px;
     border-radius: 8px;
     cursor: pointer;
-    font-family: 'Poppins', sans-serif;
+    transition: 0.3s;
 }
 
 .logout-btn:hover {
@@ -157,12 +165,16 @@
 }
 
 .admin-main {
+    width: 100%;
     max-width: 800px;
     margin: 20px auto;
     padding: 0 15px;
+    display: flex;
+    flex-direction: column;
 }
 
 .form-container {
+    width: 100%;
     background: #0d0d12;
     padding: 25px;
     border-radius: 15px;
@@ -181,10 +193,12 @@
     display: flex;
     gap: 15px;
     margin-bottom: 15px;
+    flex-wrap: wrap; /* Mobile par automatically niche aa jayega */
 }
 
 .form-row .input-group {
     flex: 1;
+    min-width: 200px; /* Bahut choti screen par bhi input squeeze na ho */
     margin-bottom: 0;
 }
 
@@ -199,10 +213,9 @@
     width: 100%;
     background: #1a1a24;
     border: 1px solid #2a2a35;
-    padding: 10px 15px;
+    padding: 12px 15px;
     border-radius: 8px;
     color: #fff;
-    font-family: 'Poppins', sans-serif;
     outline: none;
 }
 
@@ -238,16 +251,24 @@ textarea.admin-input {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
+    flex-wrap: wrap; /* Mobile par inputs niche shift ho jayenge */
+}
+
+.ep-row input {
+    flex: 1;
+    min-width: 100px;
 }
 
 .add-ep-btn {
     background: transparent;
     color: #a855f7;
     border: 1px solid #a855f7;
-    padding: 8px;
+    padding: 10px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 12px;
+    width: 100%; /* Button full width lagega */
+    margin-top: 5px;
 }
 
 .submit-btn {
