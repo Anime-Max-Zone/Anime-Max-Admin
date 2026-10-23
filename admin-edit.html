@@ -5,27 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Edit Content - Admin</title>
     
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
 
+    <!-- Header Section -->
     <header class="admin-header">
         <a href="admin-dashboard.html" class="logout-btn" style="border-color: #888; color: #888; text-decoration: none; padding: 8px 12px;">
             <i class="fa-solid fa-arrow-left"></i> Back
         </a>
         <div class="logo-text"><h1>Edit Title</h1></div>
-        <div style="width: 70px;"></div>
+        <div style="width: 70px;"></div> <!-- Flexbox balance ke liye -->
     </header>
 
+    <!-- Main Content -->
     <main class="admin-main">
         <form id="editForm" class="form-container">
+            <!-- Hidden ID -->
             <input type="hidden" id="editId">
             
+            <!-- Title & Type -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Title</label>
@@ -37,6 +48,7 @@
                 </div>
             </div>
 
+            <!-- Poster & Banner -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Poster Image URL</label>
@@ -48,6 +60,7 @@
                 </div>
             </div>
 
+            <!-- Rating & Year -->
             <div class="form-row">
                 <div class="input-group">
                     <label>Rating (0-10)</label>
@@ -59,80 +72,31 @@
                 </div>
             </div>
 
+            <!-- Genres -->
             <div class="input-group full-width">
                 <label>Genres (Comma separated)</label>
                 <input type="text" id="editGenres" class="admin-input" placeholder="Action, Fantasy">
             </div>
 
+            <!-- Synopsis -->
             <div class="input-group full-width">
                 <label>Synopsis / Description</label>
                 <textarea id="editSynopsis" class="admin-input" rows="4"></textarea>
             </div>
-
-            <!-- ================= MOVIE LINKS SECTION ================= -->
-            <!-- display: none; hata diya gaya hai taaki ye hamesha dikhe -->
-            <div id="editLinksSection" style="margin-top: 20px; border-top: 1px solid #1a1a24; padding-top: 20px;">
-                <h3 style="color: #a855f7; font-size: 16px; margin-bottom: 15px;">Links (Quality / Audio / Subtitle)</h3>
-                
-                <!-- Quality Section -->
-                <div style="margin-bottom: 15px;">
-                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
-                    <div id="editQualityContainer"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <select id="editQaLabel" class="admin-input" style="width: 110px;">
-                            <option value="480p">480p</option>
-                            <option value="720p">720p</option>
-                            <option value="1080p">1080p</option>
-                            <option value="4K">4K</option>
-                        </select>
-                        <input type="text" id="editQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
-                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editQualityContainer', 'editQaLabel', 'editQaUrl')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <!-- Audio Section -->
-                <div style="margin-bottom: 15px;">
-                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
-                    <div id="editAudioContainer"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <select id="editAuLabel" class="admin-input" style="width: 110px;">
-                            <option value="Hindi">Hindi</option>
-                            <option value="English">English</option>
-                            <option value="Tamil">Tamil</option>
-                            <option value="Telugu">Telugu</option>
-                            <option value="Japanese">Japanese</option>
-                        </select>
-                        <input type="text" id="editAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
-                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editAudioContainer', 'editAuLabel', 'editAuUrl')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                </div>
-
-                <!-- Subtitle Section -->
-                <div>
-                    <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
-                    <div id="editSubtitleContainer"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 5px;">
-                        <select id="editSubLabel" class="admin-input" style="width: 110px;">
-                            <option value="English">English</option>
-                            <option value="Hindi">Hindi</option>
-                            <option value="None">None</option>
-                        </select>
-                        <input type="text" id="editSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
-                        <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addEditLink('editSubtitleContainer', 'editSubLabel', 'editSubUrl')"><i class="fa-solid fa-plus"></i></button>
-                    </div>
-                </div>
-            </div>
             
-            <button type="submit" class="admin-btn submit-btn" style="margin-top: 25px;"><i class="fa-solid fa-check"></i> Update All Info</button>
+            <!-- Update Button -->
+            <button type="submit" class="admin-btn submit-btn" style="margin-top: 25px;"><i class="fa-solid fa-check"></i> Update Info</button>
             <p id="editStatus" class="success-msg"></p>
         </form>
 
+        <!-- Delete Section -->
         <div style="margin-top: 30px; padding: 20px; border: 1px dashed #ff4d4d; border-radius: 10px; text-align: center;">
             <p style="color: #ff4d4d; font-size: 13px; margin-bottom: 15px;">Danger Zone: Delete this title permanently?</p>
             <button id="deleteBtn" class="logout-btn" style="width: 100%; justify-content: center; padding: 12px;"><i class="fa-solid fa-trash"></i> Delete Content</button>
         </div>
     </main>
 
+    <!-- Admin JS File -->
     <script src="admin.js"></script>
 </body>
 </html>
