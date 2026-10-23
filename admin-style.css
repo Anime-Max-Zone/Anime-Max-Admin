@@ -183,7 +183,7 @@
     width: 100%;
     max-width: 800px;
     margin: 20px auto;
-    padding: 0 15px;
+    padding: 0 15px 90px 15px; /* Bottom padding add ki hai taaki content nav ke piche na chhupe */
     display: flex;
     flex-direction: column;
 }
@@ -308,60 +308,6 @@ textarea.admin-input {
     font-weight: 500;
 }
 
-/* ================= TABS & VIEWS ================= */
-.admin-tabs {
-    display: flex;
-    background: #0d0d12;
-    border-bottom: 1px solid #1a1a24;
-    overflow-x: auto;
-    scrollbar-width: none;
-}
-
-.admin-tabs::-webkit-scrollbar { display: none; }
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    color: #888;
-    padding: 15px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    font-family: 'Poppins', sans-serif;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: 0.3s;
-    white-space: nowrap;
-}
-
-.tab-btn:hover { color: #fff; }
-
-.tab-btn.active {
-    color: #a855f7;
-    border-bottom-color: #a855f7;
-}
-
-.admin-view {
-    display: none;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.admin-view.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.view-title {
-    color: #a855f7;
-    margin-bottom: 20px;
-    font-size: 20px;
-    border-bottom: 1px solid #1a1a24;
-    padding-bottom: 10px;
-}
-
 /* ================= DASHBOARD LIST ================= */
 .admin-list {
     display: flex;
@@ -405,3 +351,46 @@ textarea.admin-input {
 .edit-btn:hover { background: #a855f7; color: #fff; }
 
 .loading-text { color: #888; text-align: center; padding: 20px; }
+
+/* ================= ADMIN BOTTOM NAVIGATION ================= */
+.admin-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(13, 13, 18, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0 15px 0;
+    border-top: 1px solid #1a1a24;
+    z-index: 1000;
+}
+
+.admin-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #888;
+    font-size: 11px;
+    transition: all 0.3s ease;
+}
+
+.admin-nav-item i {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+/* Active State (Neon Purple) */
+.admin-nav-item.active {
+    color: #a855f7;
+}
+
+.admin-nav-item.active i {
+    transform: translateY(-4px) scale(1.15);
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
