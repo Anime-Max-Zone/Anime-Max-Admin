@@ -397,6 +397,7 @@ textarea.admin-input {
     color: #888;
     font-size: 11px;
     transition: all 0.3s ease;
+    flex: 1; /* 4 items ko equally space karega */
 }
 
 .admin-nav-item i {
