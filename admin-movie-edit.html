@@ -96,7 +96,7 @@
                             <option value="1080p">1080p</option>
                             <option value="4K">4K</option>
                         </select>
-                        <input type="text" id="movieQaUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
+                        <input type="text" id="movieQaUrl" class="admin-input" placeholder="URL / GDrive ID / .m3u8" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieQaContainer', 'movieQaLabel', 'movieQaUrl')"><i class="fa-solid fa-plus"></i></button>
                     </div>
                 </div>
@@ -111,6 +111,9 @@
                             <option value="English">English</option>
                             <option value="Tamil">Tamil</option>
                             <option value="Telugu">Telugu</option>
+                            <option value="Malayalam">Malayalam</option>
+                            <option value="Bengali">Bengali</option>
+                            <option value="Japanese">Japanese</option>
                         </select>
                         <input type="text" id="movieAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieAuContainer', 'movieAuLabel', 'movieAuUrl')"><i class="fa-solid fa-plus"></i></button>
@@ -119,12 +122,18 @@
 
                 <!-- 3. SUBTITLE -->
                 <div>
-                    <label style="color:#aaa; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles</label>
+                    <label style="color:#aaa; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
                     <div id="movieSubContainer"></div>
                     <div style="display: flex; gap: 10px; margin-top: 5px;">
                         <select id="movieSubLabel" class="admin-input" style="width: 110px;">
-                            <option value="English">English</option>
                             <option value="Hindi">Hindi</option>
+                            <option value="English">English</option>
+                            <option value="Tamil">Tamil</option>
+                            <option value="Telugu">Telugu</option>
+                            <option value="Malayalam">Malayalam</option>
+                            <option value="Bengali">Bengali</option>
+                            <option value="Japanese">Japanese</option>
+                            <option value="None">None</option>
                         </select>
                         <input type="text" id="movieSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
                         <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieSubContainer', 'movieSubLabel', 'movieSubUrl')"><i class="fa-solid fa-plus"></i></button>
@@ -142,6 +151,26 @@
             <button id="deleteMovieBtn" class="logout-btn" style="width: 100%; justify-content: center; padding: 12px;"><i class="fa-solid fa-trash"></i> Delete Movie</button>
         </div>
     </main>
+
+    <!-- Admin Bottom Navigation -->
+    <nav class="admin-bottom-nav">
+        <a href="admin-dashboard.html" class="admin-nav-item">
+            <i class="fa-solid fa-list"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-add-title.html" class="admin-nav-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Title</span>
+        </a>
+        <a href="admin-upload.html" class="admin-nav-item">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload</span>
+        </a>
+        <a href="admin-comments.html" class="admin-nav-item">
+            <i class="fa-solid fa-comments"></i>
+            <span>Comments</span>
+        </a>
+    </nav>
 
     <!-- Admin JS File -->
     <script src="admin.js"></script>
