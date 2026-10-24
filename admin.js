@@ -20,6 +20,8 @@ const db = firebase.database();
 let globalContentData = {}; 
 
 // ================= GLOBAL HELPER FUNCTIONS =================
+// Ye functions HTML ke onclick se direct call hote hain (Link add/remove ke liye)
+
 window.addLink = (containerId, labelId, urlId) => {
     const label = document.getElementById(labelId).value;
     const url = document.getElementById(urlId).value.trim();
