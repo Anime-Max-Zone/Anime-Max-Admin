@@ -5,11 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Upload - Admin</title>
     
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <!-- Admin CSS File -->
     <link rel="stylesheet" href="admin-style.css">
 </head>
 <body class="admin-body dashboard-body">
@@ -39,7 +46,7 @@
 
                     <!-- 1. QUALITY SECTION -->
                     <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
+                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities (Video Link)</label>
                         <div id="movieQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <select id="movieQaLabel" class="admin-input" style="width: 110px;">
@@ -48,14 +55,14 @@
                                 <option value="1080p">1080p</option>
                                 <option value="4K">4K</option>
                             </select>
-                            <input type="text" id="movieQaUrl" class="admin-input" placeholder="URL / .m3u8" style="flex: 1;">
+                            <input type="text" id="movieQaUrl" class="admin-input" placeholder="video.m3u8 URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieQualityContainer', 'movieQaLabel', 'movieQaUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
                     <!-- 2. AUDIO SECTION -->
                     <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
+                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks (Audio Link)</label>
                         <div id="movieAudioContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <select id="movieAuLabel" class="admin-input" style="width: 110px;">
@@ -67,7 +74,7 @@
                                 <option value="Bengali">Bengali</option>
                                 <option value="Japanese">Japanese</option>
                             </select>
-                            <input type="text" id="movieAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
+                            <input type="text" id="movieAuUrl" class="admin-input" placeholder="audio.m3u8 URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieAudioContainer', 'movieAuLabel', 'movieAuUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
@@ -117,7 +124,7 @@
                     
                     <!-- 1. QUALITY SECTION -->
                     <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities</label>
+                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities (Video Link)</label>
                         <div id="animeQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <select id="animeQaLabel" class="admin-input" style="width: 110px;">
@@ -126,14 +133,14 @@
                                 <option value="1080p">1080p</option>
                                 <option value="4K">4K</option>
                             </select>
-                            <input type="text" id="animeQaUrl" class="admin-input" placeholder="URL / .m3u8" style="flex: 1;">
+                            <input type="text" id="animeQaUrl" class="admin-input" placeholder="video.m3u8 URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeQualityContainer', 'animeQaLabel', 'animeQaUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
                     <!-- 2. AUDIO SECTION -->
                     <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks</label>
+                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks (Audio Link)</label>
                         <div id="animeAudioContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
                             <select id="animeAuLabel" class="admin-input" style="width: 110px;">
@@ -145,7 +152,7 @@
                                 <option value="Bengali">Bengali</option>
                                 <option value="Japanese">Japanese</option>
                             </select>
-                            <input type="text" id="animeAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
+                            <input type="text" id="animeAuUrl" class="admin-input" placeholder="audio.m3u8 URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeAudioContainer', 'animeAuLabel', 'animeAuUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
