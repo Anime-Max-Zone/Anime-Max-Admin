@@ -19,9 +19,7 @@ const db = firebase.database();
 
 let globalContentData = {}; 
 
-// ================= GLOBAL HELPER FUNCTIONS (Har page ke liye zaroori) =================
-// Ye functions yahan isliye rakhe gaye hain taaki HTML ke onclick se direct call ho sakein
-
+// ================= GLOBAL HELPER FUNCTIONS =================
 window.addLink = (containerId, labelId, urlId) => {
     const label = document.getElementById(labelId).value;
     const url = document.getElementById(urlId).value.trim();
@@ -100,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-
     // --- 2.2 LOGIN PAGE LOGIC ---
     const loginBtn = document.getElementById('loginBtn');
     const googleLoginBtn = document.getElementById('googleLoginBtn');
@@ -148,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'admin-dashboard.html'; 
         }
     });
-
 
     // --- 2.3 DASHBOARD PAGE LOGIC ---
     const animeListContainer = document.getElementById('animeListContainer');
@@ -198,7 +194,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(err => alert("Error: " + err.message));
         }
     };
-
 
     // --- 2.4 SERIES DETAILS PAGE LOGIC ---
     const seriesInfoCard = document.getElementById('seriesInfoCard');
@@ -257,7 +252,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     // --- 2.5 ADD TITLE PAGE LOGIC ---
     const addTitleForm = document.getElementById('addTitleForm');
     if (addTitleForm) {
@@ -287,7 +281,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(err => { status.innerText = "Error: " + err.message; status.style.color = "#ff4d4d"; });
         });
     }
-
 
     // --- 2.6 UPLOAD PAGE LOGIC ---
     const uploadTitleSelect = document.getElementById('uploadTitleSelect');
@@ -356,7 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // --- 2.7 EDIT SERIES INFO PAGE ---
     const editForm = document.getElementById('editForm');
     if (editForm) {
@@ -414,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     // --- 2.8 EDIT EPISODE PAGE ---
     const episodeEditForm = document.getElementById('episodeEditForm');
     if (episodeEditForm) {
@@ -433,7 +424,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editEpNumber').value = data.ep || '';
                 document.getElementById('editEpTitle').value = data.title || '';
                 
-                // Global function call
                 renderExistingLinks('epQualityContainer', data.qualities);
                 renderExistingLinks('epAudioContainer', data.audios);
                 renderExistingLinks('epSubtitleContainer', data.subtitles);
@@ -485,7 +475,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editMovieGenres').value = data.genres ? data.genres.join(', ') : '';
                 document.getElementById('editMovieSynopsis').value = data.synopsis || '';
 
-                // Global function call
                 renderExistingLinks('movieQaContainer', data.qualities);
                 renderExistingLinks('movieAuContainer', data.audios);
                 renderExistingLinks('movieSubContainer', data.subtitles);
@@ -535,7 +524,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const commentCount = document.getElementById('commentCount');
 
         function fetchAllComments() {
-            // Fetch comments and content data simultaneously
             Promise.all([
                 db.ref('comments').once('value'),
                 db.ref('content').once('value')
@@ -553,7 +541,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let allComments = [];
 
-                // Flatten the comments object
                 Object.keys(commentsData).forEach(animeId => {
                     const animeTitle = contentData[animeId] ? contentData[animeId].title : 'Unknown Anime/Movie';
                     
@@ -567,7 +554,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                 });
 
-                // Sort by newest first
                 allComments.sort((a, b) => b.timestamp - a.timestamp);
                 if(commentCount) commentCount.innerText = `${allComments.length} Items`;
 
@@ -576,7 +562,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // Render Comments
                 allComments.forEach(comment => {
                     const date = new Date(comment.timestamp);
                     const timeString = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
@@ -606,20 +591,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Initial fetch
         fetchAllComments();
 
-        // Delete Comment Function
         window.deleteAdminComment = (animeId, commentKey) => {
             if (confirm("Are you sure you want to delete this comment?")) {
                 db.ref(`comments/${animeId}/${commentKey}`).remove()
                     .then(() => {
-                        // Refresh the comments list immediately
                         fetchAllComments(); 
                     })
                     .catch((err) => alert("Error deleting comment: " + err.message));
             }
         };
     }
-
 });
