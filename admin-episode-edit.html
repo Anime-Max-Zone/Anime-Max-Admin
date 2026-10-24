@@ -72,6 +72,8 @@
                         <option value="English">English</option>
                         <option value="Tamil">Tamil</option>
                         <option value="Telugu">Telugu</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Bengali">Bengali</option>
                         <option value="Japanese">Japanese</option>
                     </select>
                     <input type="text" id="epAuUrl" class="admin-input" placeholder="URL / GDrive ID" style="flex: 1;">
@@ -85,8 +87,13 @@
                 <div id="epSubtitleContainer"></div>
                 <div style="display: flex; gap: 10px; margin-top: 5px;">
                     <select id="epSubLabel" class="admin-input" style="width: 110px;">
-                        <option value="English">English</option>
                         <option value="Hindi">Hindi</option>
+                        <option value="English">English</option>
+                        <option value="Tamil">Tamil</option>
+                        <option value="Telugu">Telugu</option>
+                        <option value="Malayalam">Malayalam</option>
+                        <option value="Bengali">Bengali</option>
+                        <option value="Japanese">Japanese</option>
                         <option value="None">None</option>
                     </select>
                     <input type="text" id="epSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
@@ -99,6 +106,26 @@
             <p id="epEditStatus" class="success-msg"></p>
         </form>
     </main>
+
+    <!-- Admin Bottom Navigation -->
+    <nav class="admin-bottom-nav">
+        <a href="admin-dashboard.html" class="admin-nav-item">
+            <i class="fa-solid fa-list"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-add-title.html" class="admin-nav-item">
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Title</span>
+        </a>
+        <a href="admin-upload.html" class="admin-nav-item">
+            <i class="fa-solid fa-upload"></i>
+            <span>Upload</span>
+        </a>
+        <a href="admin-comments.html" class="admin-nav-item">
+            <i class="fa-solid fa-comments"></i>
+            <span>Comments</span>
+        </a>
+    </nav>
 
     <!-- Admin JS File -->
     <script src="admin.js"></script>
