@@ -46,7 +46,7 @@
                 </div>
             </div>
 
-            <!-- 1. QUALITY SECTION -->
+            <!-- ONLY QUALITY SECTION -->
             <div style="margin-bottom: 20px; margin-top: 20px;">
                 <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities (Video Link)</label>
                 <div id="epQualityContainer"></div>
@@ -57,49 +57,8 @@
                         <option value="1080p">1080p</option>
                         <option value="4K">4K</option>
                     </select>
-                    <!-- 🔥 Video Link Yahan Daalein 🔥 -->
                     <input type="text" id="epQaUrl" class="admin-input" placeholder="video.m3u8 URL" style="flex: 1;">
                     <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('epQualityContainer', 'epQaLabel', 'epQaUrl')"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
-
-            <!-- 2. AUDIO SECTION -->
-            <div style="margin-bottom: 20px;">
-                <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks (Audio Link)</label>
-                <div id="epAudioContainer"></div>
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                    <select id="epAuLabel" class="admin-input" style="width: 110px;">
-                        <option value="Hindi">Hindi</option>
-                        <option value="English">English</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Telugu">Telugu</option>
-                        <option value="Malayalam">Malayalam</option>
-                        <option value="Bengali">Bengali</option>
-                        <option value="Japanese">Japanese</option>
-                    </select>
-                    <!-- 🔥 Audio Link Yahan Daalein 🔥 -->
-                    <input type="text" id="epAuUrl" class="admin-input" placeholder="audio.m3u8 URL" style="flex: 1;">
-                    <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('epAudioContainer', 'epAuLabel', 'epAuUrl')"><i class="fa-solid fa-plus"></i></button>
-                </div>
-            </div>
-
-            <!-- 3. SUBTITLE SECTION -->
-            <div>
-                <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
-                <div id="epSubtitleContainer"></div>
-                <div style="display: flex; gap: 10px; margin-top: 5px;">
-                    <select id="epSubLabel" class="admin-input" style="width: 110px;">
-                        <option value="Hindi">Hindi</option>
-                        <option value="English">English</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Telugu">Telugu</option>
-                        <option value="Malayalam">Malayalam</option>
-                        <option value="Bengali">Bengali</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="None">None</option>
-                    </select>
-                    <input type="text" id="epSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
-                    <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('epSubtitleContainer', 'epSubLabel', 'epSubUrl')"><i class="fa-solid fa-plus"></i></button>
                 </div>
             </div>
             
