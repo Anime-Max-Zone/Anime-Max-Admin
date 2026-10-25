@@ -44,8 +44,8 @@
                 <div class="season-box" style="border-color: #a855f7; border-style: solid;">
                     <h4>Movie Details</h4>
 
-                    <!-- 1. QUALITY SECTION -->
-                    <div style="margin-bottom: 20px;">
+                    <!-- ONLY QUALITY SECTION -->
+                    <div>
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities (Video Link)</label>
                         <div id="movieQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
@@ -59,46 +59,6 @@
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieQualityContainer', 'movieQaLabel', 'movieQaUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
-
-                    <!-- 2. AUDIO SECTION -->
-                    <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks (Audio Link)</label>
-                        <div id="movieAudioContainer"></div>
-                        <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <select id="movieAuLabel" class="admin-input" style="width: 110px;">
-                                <option value="Hindi">Hindi</option>
-                                <option value="English">English</option>
-                                <option value="Tamil">Tamil</option>
-                                <option value="Telugu">Telugu</option>
-                                <option value="Malayalam">Malayalam</option>
-                                <option value="Bengali">Bengali</option>
-                                <option value="Japanese">Japanese</option>
-                            </select>
-                            <input type="text" id="movieAuUrl" class="admin-input" placeholder="audio.m3u8 URL" style="flex: 1;">
-                            <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieAudioContainer', 'movieAuLabel', 'movieAuUrl')"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- 3. SUBTITLE SECTION -->
-                    <div>
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
-                        <div id="movieSubtitleContainer"></div>
-                        <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <select id="movieSubLabel" class="admin-input" style="width: 110px;">
-                                <option value="Hindi">Hindi</option>
-                                <option value="English">English</option>
-                                <option value="Tamil">Tamil</option>
-                                <option value="Telugu">Telugu</option>
-                                <option value="Malayalam">Malayalam</option>
-                                <option value="Bengali">Bengali</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="None">None</option>
-                            </select>
-                            <input type="text" id="movieSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
-                            <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('movieSubtitleContainer', 'movieSubLabel', 'movieSubUrl')"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -122,8 +82,8 @@
                 <div class="season-box">
                     <h4>Episode Links</h4>
                     
-                    <!-- 1. QUALITY SECTION -->
-                    <div style="margin-bottom: 20px;">
+                    <!-- ONLY QUALITY SECTION -->
+                    <div>
                         <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Video Qualities (Video Link)</label>
                         <div id="animeQualityContainer"></div>
                         <div style="display: flex; gap: 10px; margin-top: 5px;">
@@ -135,45 +95,6 @@
                             </select>
                             <input type="text" id="animeQaUrl" class="admin-input" placeholder="video.m3u8 URL" style="flex: 1;">
                             <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeQualityContainer', 'animeQaLabel', 'animeQaUrl')"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- 2. AUDIO SECTION -->
-                    <div style="margin-bottom: 20px;">
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Audio Tracks (Audio Link)</label>
-                        <div id="animeAudioContainer"></div>
-                        <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <select id="animeAuLabel" class="admin-input" style="width: 110px;">
-                                <option value="Hindi">Hindi</option>
-                                <option value="English">English</option>
-                                <option value="Tamil">Tamil</option>
-                                <option value="Telugu">Telugu</option>
-                                <option value="Malayalam">Malayalam</option>
-                                <option value="Bengali">Bengali</option>
-                                <option value="Japanese">Japanese</option>
-                            </select>
-                            <input type="text" id="animeAuUrl" class="admin-input" placeholder="audio.m3u8 URL" style="flex: 1;">
-                            <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeAudioContainer', 'animeAuLabel', 'animeAuUrl')"><i class="fa-solid fa-plus"></i></button>
-                        </div>
-                    </div>
-
-                    <!-- 3. SUBTITLE SECTION -->
-                    <div>
-                        <label style="color:#a855f7; font-size:13px; font-weight:600; margin-bottom: 5px; display:block;">Subtitles (.vtt)</label>
-                        <div id="animeSubtitleContainer"></div>
-                        <div style="display: flex; gap: 10px; margin-top: 5px;">
-                            <select id="animeSubLabel" class="admin-input" style="width: 110px;">
-                                <option value="Hindi">Hindi</option>
-                                <option value="English">English</option>
-                                <option value="Tamil">Tamil</option>
-                                <option value="Telugu">Telugu</option>
-                                <option value="Malayalam">Malayalam</option>
-                                <option value="Bengali">Bengali</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="None">None</option>
-                            </select>
-                            <input type="text" id="animeSubUrl" class="admin-input" placeholder=".vtt URL" style="flex: 1;">
-                            <button type="button" class="add-ep-btn" style="width: auto; padding: 0 15px; margin-top:0;" onclick="addLink('animeSubtitleContainer', 'animeSubLabel', 'animeSubUrl')"><i class="fa-solid fa-plus"></i></button>
                         </div>
                     </div>
 
