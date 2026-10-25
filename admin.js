@@ -26,6 +26,8 @@ window.addLink = (containerId, labelId, urlId) => {
     if(!label || !url) { alert("Please fill Label and URL!"); return; }
 
     const container = document.getElementById(containerId);
+    if(!container) return; 
+
     const row = document.createElement('div');
     row.style.cssText = "display: flex; justify-content: space-between; align-items: center; background: #0d0d12; padding: 8px 12px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #2a2a35;";
     row.innerHTML = `
@@ -41,7 +43,10 @@ window.addLink = (containerId, labelId, urlId) => {
 };
 
 window.getLinksData = (containerId) => {
-    const rows = document.querySelectorAll(`#${containerId} div`);
+    const container = document.getElementById(containerId);
+    if(!container) return {}; 
+
+    const rows = container.querySelectorAll(`div`);
     let data = {};
     rows.forEach(row => {
         if(row.querySelector('.link-label')) {
@@ -307,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('uploadAnimeFields').style.display = key && globalContentData[key].type === 'anime' ? 'block' : 'none';
             document.getElementById('uploadSubmitBtn').style.display = key ? 'flex' : 'none';
             
-            ['movieQualityContainer', 'movieAudioContainer', 'movieSubtitleContainer', 'animeQualityContainer', 'animeAudioContainer', 'animeSubtitleContainer'].forEach(id => {
+            ['movieQualityContainer', 'animeQualityContainer'].forEach(id => {
                 if(document.getElementById(id)) document.getElementById(id).innerHTML = '';
             });
         });
@@ -321,9 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(item.type === 'movie') {
                 db.ref('content/' + key).update({
-                    qualities: getLinksData('movieQualityContainer'),
-                    audios: getLinksData('movieAudioContainer'),
-                    subtitles: getLinksData('movieSubtitleContainer')
+                    qualities: getLinksData('movieQualityContainer')
                 }).then(() => { 
                     status.innerText = "Movie Updated!"; status.style.color = "#22c55e"; 
                     setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000); 
@@ -338,9 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 db.ref(`content/${key}/seasons/${seasonName}`).push({ 
                     ep: parseInt(epNo), 
                     title: epTitle, 
-                    qualities: getLinksData('animeQualityContainer'), 
-                    audios: getLinksData('animeAudioContainer'), 
-                    subtitles: getLinksData('animeSubtitleContainer')
+                    qualities: getLinksData('animeQualityContainer')
                 }).then(() => { 
                     status.innerText = "Episode Added!"; status.style.color = "#22c55e"; 
                     setTimeout(() => { window.location.href = 'admin-dashboard.html'; }, 1000); 
@@ -425,8 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editEpTitle').value = data.title || '';
                 
                 renderExistingLinks('epQualityContainer', data.qualities);
-                renderExistingLinks('epAudioContainer', data.audios);
-                renderExistingLinks('epSubtitleContainer', data.subtitles);
             }
         });
 
@@ -438,9 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const updatedEp = {
                 ep: parseInt(document.getElementById('editEpNumber').value),
                 title: document.getElementById('editEpTitle').value.trim(),
-                qualities: getLinksData('epQualityContainer'),
-                audios: getLinksData('epAudioContainer'),
-                subtitles: getLinksData('epSubtitleContainer')
+                qualities: getLinksData('epQualityContainer')
             };
 
             epRef.update(updatedEp).then(() => {
@@ -476,8 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('editMovieSynopsis').value = data.synopsis || '';
 
                 renderExistingLinks('movieQaContainer', data.qualities);
-                renderExistingLinks('movieAuContainer', data.audios);
-                renderExistingLinks('movieSubContainer', data.subtitles);
             }
         });
 
@@ -494,9 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 year: document.getElementById('editMovieYear').value.trim(),
                 genres: document.getElementById('editMovieGenres').value.split(',').map(g => g.trim()).filter(g => g),
                 synopsis: document.getElementById('editMovieSynopsis').value.trim(),
-                qualities: getLinksData('movieQaContainer'),
-                audios: getLinksData('movieAuContainer'),
-                subtitles: getLinksData('movieSubContainer')
+                qualities: getLinksData('movieQaContainer')
             };
 
             movieRef.update(updatedData).then(() => {
