@@ -3,20 +3,25 @@
 
 # ================= AUDIO TRACKS =================
 # 1. Hindi Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Hindi",LANGUAGE="hi",DEFAULT=YES,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/zFn9XzTFPHR/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Hindi",LANGUAGE="hi",DEFAULT=YES,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/4ZBMPOVNlYG/audio.m3u8"
 
 # 2. English Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="English",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/pqsdcoDkV4q/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="English",LANGUAGE="en",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/dYhafV7WumT/audio.m3u8"
 
 # 3. Tamil Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Tamil",LANGUAGE="ta",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/HPTRU9GSRNy/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Tamil",LANGUAGE="ta",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/sWpPdOOxYy4/audio.m3u8"
 
 # 4. Telugu Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Telugu",LANGUAGE="te",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/DQfnccz0Coe/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Telugu",LANGUAGE="te",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/YzYjQDhXsdZ/audio.m3u8"
 
 # 5. Japanese Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Japanese",LANGUAGE="ja",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/NN8jvEIlC0n/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Japanese",LANGUAGE="ja",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/IcT0ZHiznzc/audio.m3u8"
 
+# 6. Bengali Audio
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Bengali",LANGUAGE="be",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/Y9Uhj8QJhUk/audio.m3u8"
+
+# 7. Malayalam Audio
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Malayalam",LANGUAGE="ma",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/tHmyT1oVZdd/audio.m3u8"
 
 # ================= SUBTITLE TRACKS =================
 
@@ -36,4 +41,4 @@ https://vdohls.com/Ecjj9PJL7fY/video.m3u8
 
 # 480p Quality
 #EXT-X-STREAM-INF:BANDWIDTH=1200000,RESOLUTION=854x480,AUDIO="audio",SUBTITLES="subs",CODECS="avc1.4d401e,mp4a.40.2"
-https://vdohls.com/ZZwZUXitkxI/video.m3u8
+https://vdohls.com/zvT6DKqwpgr/video.m3u8
