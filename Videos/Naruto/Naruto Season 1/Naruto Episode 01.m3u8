@@ -12,7 +12,7 @@
 #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Tamil",LANGUAGE="ta",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/tWg2rHeT3ac/audio.m3u8"
 
 # 4. Telugu Audio
-#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Telugu",LANGUAGE="te",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/6vt3L1L8MqC/audio.m3u8"
+#EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Telugu",LANGUAGE="te",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/DQfnccz0Coe/audio.m3u8"
 
 # 5. Japanese Audio
 #EXT-X-MEDIA:TYPE=AUDIO,GROUP-ID="audio",NAME="Japanese",LANGUAGE="ja",DEFAULT=NO,AUTOSELECT=YES,CHANNELS="2",URI="https://vdohls.com/mkjCNdrbtFC/audio.m3u8"
